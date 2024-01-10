@@ -1,7 +1,7 @@
 module.exports = {
   expo: {
-    name: 'Ischemic Stroke',
-    slug: 'stroke-mgmt',
+    name: 'ICH',
+    slug: 'ich-stroke-mgmt',
     version: '1.1.1',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
@@ -17,14 +17,14 @@ module.exports = {
     assetBundlePatterns: ['**/*'],
     ios: {
       supportsTablet: true,
-      bundleIdentifier: 'com.strokemgmtapp.strokemgmt',
+      bundleIdentifier: 'com.strokemgmtapp.ichstrokemgmt',
     },
     android: {
       adaptiveIcon: {
         foregroundImage: './assets/adaptive-icon.png',
         backgroundColor: '#000000',
       },
-      package: 'com.strokemgmtapp.strokemgmt',
+      package: 'com.strokemgmtapp.ichstrokemgmt',
       versionCode: 2,
     },
     androidNavigationBar: {
@@ -35,13 +35,10 @@ module.exports = {
       favicon: './assets/favicon.png',
     },
     extra: {
-      eas: {
-        projectId: '935f864e-12bb-456a-8214-8070b8ba5baa',
-      },
       NODE_ENV: process.env.NODE_ENV,
-    },
-    updates: {
-      url: 'https://u.expo.dev/935f864e-12bb-456a-8214-8070b8ba5baa',
+      eas: {
+        projectId: 'f351a43d-cf44-4cb8-a532-e2fd389442f6',
+      },
     },
     runtimeVersion: {
       policy: 'appVersion',
