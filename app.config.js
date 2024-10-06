@@ -2,7 +2,7 @@ module.exports = {
   expo: {
     name: 'ICH',
     slug: 'ich-stroke-mgmt',
-    version: '1.1.1',
+    version: '1.1.2',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
     jsEngine: 'hermes',
@@ -25,7 +25,7 @@ module.exports = {
         backgroundColor: '#000000',
       },
       package: 'com.strokemgmtapp.ichstrokemgmt',
-      versionCode: 2,
+      versionCode: 3,
     },
     androidNavigationBar: {
       barStyle: 'dark-content',
@@ -43,5 +43,6 @@ module.exports = {
     runtimeVersion: {
       policy: 'appVersion',
     },
+    plugins: ['expo-asset'],
   },
 };

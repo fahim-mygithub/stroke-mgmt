@@ -71,7 +71,7 @@ export const module = {
       ? 'https://ich-mgmt-cms.a2hosted.com'
       : `http://${localhost}:1337`,
   ],
-  currentVersion: ['value', new Version(1, 1, 1)],
+  currentVersion: ['value', new Version(1, 1, 2)],
 
   // DOMAIN
   imageCache: ['type', ImageCache],
