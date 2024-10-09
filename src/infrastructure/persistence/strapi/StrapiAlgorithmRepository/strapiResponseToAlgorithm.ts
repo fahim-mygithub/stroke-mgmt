@@ -54,7 +54,7 @@ export const strapiResponseToAlgorithm = (
   let thumbnail = defaultThumbnail;
   if (attributes.Thumbnail.data !== null) {
     thumbnail = new Image(
-      strapiHostUrl + attributes.Thumbnail.data.attributes.formats.thumbnail.url
+      strapiHostUrl + attributes.Thumbnail.data.attributes.url
     );
   }
 

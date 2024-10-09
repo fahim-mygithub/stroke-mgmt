@@ -25,7 +25,7 @@ export const strapiResponseToArticle = (
   let thumbnail = defaultThumbnail;
   if (attributes.Thumbnail && attributes.Thumbnail?.data !== null) {
     thumbnail = new Image(
-      strapiHostUrl + attributes.Thumbnail.data.attributes.formats.thumbnail.url
+      strapiHostUrl + attributes.Thumbnail.data.attributes.url
     );
   }
 

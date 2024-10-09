@@ -40,7 +40,7 @@ class StrapiPlaceholderImageRepository implements ImageRepository {
     const response = await this.fetchData();
     const data = response.data as StrapiPlaceholderImageData;
     return data.attributes.Images.data.map(
-      (i) => new Image(this.strapiHostUrl + i.attributes.formats.thumbnail.url)
+      (i) => new Image(this.strapiHostUrl + i.attributes.url)
     );
   }
 
