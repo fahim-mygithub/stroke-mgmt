@@ -1,3 +1,3 @@
-import * as cheerio from 'cheerio';
+import * as cheerio from 'cheerio-without-node-native';
 
 export { cheerio };

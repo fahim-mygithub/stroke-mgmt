@@ -25,7 +25,8 @@
     "@types/ejs": "^3.1.1",
     "@types/node": "^18.11.9",
     "@types/sha.js": "^2.4.0",
-    "cheerio": "^1.0.0-rc.12",
+    "cheerio": "^1.0.0",
+    "cheerio-without-node-native": "^1.0.0-rc.2",
     "didi": "^8.0.0",
     "ejs": "^3.1.9",
     "expo": "51",
@@ -49,6 +50,8 @@
     "react-native-webview": "13.8.6",
     "sanitize-html": "^2.10.0",
     "sha.js": "^2.4.11",
+    "stream": "^0.0.3",
+    "util": "^0.12.5",
     "uuid": "^9.0.0"
   },
   "devDependencies": {
