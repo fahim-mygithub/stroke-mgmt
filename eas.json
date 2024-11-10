@@ -1,6 +1,7 @@
 {
   "cli": {
-    "version": ">= 2.7.1",
+    "version": ">=12.5.4",
+    "appVersionSource": "local",
     "promptToConfigurePushNotifications": false
   },
   "build": {
