@@ -86,7 +86,7 @@ class StrapiArticleRepository implements ArticleRepository {
 
   async getByDesignation(designation: BaseDesignation): Promise<Article[]> {
     const searchParams = new URLSearchParams({
-      'filters=[Designation]': designation.toString(),
+      'filters[Designation]': designation.toString(),
     });
     const { data } = await this.get(
       `/api/articles/?${searchParams}&${populateSearchParams}`
