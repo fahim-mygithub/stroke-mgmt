@@ -71,7 +71,7 @@ export const module = {
       ? 'https://stroke-mgmt-cms.a2hosted.com'
       : `http://${localhost}:1337`,
   ],
-  currentVersion: ['value', new Version(1, 1, 2)],
+  currentVersion: ['value', new Version(1, 1, 3)],
 
   // DOMAIN
   imageCache: ['type', ImageCache],
