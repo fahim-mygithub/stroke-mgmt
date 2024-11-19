@@ -25,7 +25,7 @@ module.exports = {
         backgroundColor: '#000000',
       },
       package: 'com.strokemgmtapp.strokemgmt',
-      versionCode: 3,
+      versionCode: 4,
     },
     androidNavigationBar: {
       barStyle: 'dark-content',
