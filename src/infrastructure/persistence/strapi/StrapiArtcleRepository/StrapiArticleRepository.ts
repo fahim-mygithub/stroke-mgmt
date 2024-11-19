@@ -85,12 +85,11 @@ class StrapiArticleRepository implements ArticleRepository {
   }
 
   async getByDesignation(designation: BaseDesignation): Promise<Article[]> {
-    const designationName = designation.toString();
-
+    const searchParams = new URLSearchParams({
+      'filters=[Designation]': designation.toString(),
+    });
     const { data } = await this.get(
-      `/api/articles/?filters[Designation]=${encodeURI(
-        designationName
-      )}&${populateSearchParams}`
+      `/api/articles/?${searchParams}&${populateSearchParams}`
     );
     const promises = (data as StrapiArticleData[]).map((d) =>
       this.getDefaultThumbnailAndMakeArticle(d)
@@ -133,8 +132,11 @@ class StrapiArticleRepository implements ArticleRepository {
   }
 
   async getMetadataById(id: ArticleId): Promise<ArticleMetadata> {
+    const searchParams = new URLSearchParams({
+      'fields[0]': 'updatedAt',
+    });
     const { data } = await this.getSingle<StrapiArticleMetadata>(
-      `/api/articles/${id}?fields[0]=updatedAt`
+      `/api/articles/${id}?${searchParams}`
     );
     return new ArticleMetadata(
       new ArticleId(data.id.toString()),
@@ -143,8 +145,11 @@ class StrapiArticleRepository implements ArticleRepository {
   }
 
   async getAllMetadata(): Promise<ArticleMetadata[]> {
+    const searchParams = new URLSearchParams({
+      'fields[0]': 'updatedAt',
+    });
     const { data } = await this.getMultiple<StrapiArticleMetadata>(
-      '/api/articles?fields[0]=updatedAt'
+      `/api/articles?${searchParams}`
     );
     return data.map(
       (d) =>

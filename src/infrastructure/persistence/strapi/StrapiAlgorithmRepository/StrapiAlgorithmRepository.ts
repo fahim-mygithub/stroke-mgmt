@@ -81,8 +81,11 @@ class StrapiAlgorithmRepository implements AlgorithmRepository {
   }
 
   async getAllShownOnHomeScreen(): Promise<Algorithm[]> {
+    const searchParams = new URLSearchParams({
+      'filters[ShowOnHomeScreen]': 'true',
+    });
     const { data } = await this.get<StrapiAlgorithmData>(
-      `/api/algorithms?filters[ShowOnHomeScreen]=true&${populateSearchParams}`
+      `/api/algorithms?${searchParams}&${populateSearchParams}`
     );
     const promises = (data as StrapiAlgorithmData[]).map((d) =>
       this.getDefaultThumbnailAndMakeArticle(d)
@@ -91,8 +94,11 @@ class StrapiAlgorithmRepository implements AlgorithmRepository {
   }
 
   async getAllMetadata(): Promise<AlgorithmMetadata[]> {
+    const searchParams = new URLSearchParams({
+      'fields[0]': 'updatedAt',
+    });
     const { data } = await this.getMultiple<StrapiAlgorithmMetadata>(
-      `/api/algorithms?fields[0]=updatedAt`
+      `/api/algorithms?${searchParams}`
     );
     return data.map(
       (d) =>
@@ -104,9 +110,12 @@ class StrapiAlgorithmRepository implements AlgorithmRepository {
   }
 
   async getMetadataById(id: AlgorithmId): Promise<AlgorithmMetadata> {
+    const searchParams = new URLSearchParams({
+      'fields[0]': 'updatedAt',
+    });
     const idString = id.toString();
     const { data } = await this.getSingle<StrapiAlgorithmMetadata>(
-      `/api/algorithms/${idString}?fields[0]=updatedAt`
+      `/api/algorithms/${idString}?${searchParams}`
     );
     return new AlgorithmMetadata(
       new AlgorithmId(data.id.toString()),
