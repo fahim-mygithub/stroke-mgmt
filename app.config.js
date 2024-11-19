@@ -2,7 +2,7 @@ module.exports = {
   expo: {
     name: 'ICH',
     slug: 'ich-stroke-mgmt',
-    version: '1.1.2',
+    version: '1.1.3',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
     jsEngine: 'hermes',
