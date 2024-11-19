@@ -88,7 +88,7 @@ class StrapiArticleRepository implements ArticleRepository {
     const designationName = designation.toString();
 
     const { data } = await this.get(
-      `/api/articles/?filters[Designation]=${encodeURI(
+      `/api/articles/?filters%5BDesignation%5D=${encodeURI(
         designationName
       )}&${populateSearchParams}`
     );
