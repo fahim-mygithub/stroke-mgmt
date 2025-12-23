@@ -1,9 +1,8 @@
-import type { ImageStore } from '@/domain/models/Image';
-import { CachedImageMetadata } from '@/domain/models/Image';
-import * as ExpoFileSystem from 'expo-file-system';
+import { Directory, File, Paths } from 'expo-file-system';
 import { v4 as uuidv4 } from 'uuid';
 
-const DEST_DIRECTORY = `${ExpoFileSystem.cacheDirectory}/images-v1`;
+import type { ImageStore } from '@/domain/models/Image';
+import { CachedImageMetadata } from '@/domain/models/Image';
 
 const MIME_TYPES = {
   JPEG: 'image/jpeg',
@@ -33,49 +32,38 @@ function extToMimeType(ext: string) {
 }
 
 class ExpoFileSystemImageStore implements ImageStore {
-  ready: Promise<void>;
+  imagesDir: Directory;
 
   constructor() {
-    this.ready = this.prepareCacheDirectory();
+    this.imagesDir = new Directory(Paths.cache, 'images-v2');
+    this.prepareCacheDirectory();
   }
 
-  private async prepareCacheDirectory() {
-    const info = await ExpoFileSystem.getInfoAsync(DEST_DIRECTORY);
-    if (!info.exists) await ExpoFileSystem.makeDirectoryAsync(DEST_DIRECTORY);
+  private prepareCacheDirectory() {
+    if (!this.imagesDir.exists) this.imagesDir.create();
   }
 
   async getFileAsBase64Url(metadata: CachedImageMetadata): Promise<string> {
-    await this.ready;
-    const base64String = await ExpoFileSystem.readAsStringAsync(
-      metadata.getFilePath(),
-      {
-        encoding: 'base64',
-      }
-    );
+    const file = new File(metadata.getFilePath());
+    const base64String = await file.base64();
     return `data:${metadata.getMimeType()};base64,${base64String}`;
   }
 
   async saveFileFromUrl(url: string): Promise<CachedImageMetadata> {
-    await this.ready;
     const ext = url.match(/\.[a-zA-Z]+$/)?.[0] ?? '';
-    const destination = `${DEST_DIRECTORY}/${uuidv4()}${ext}`;
-    const result = await ExpoFileSystem.downloadAsync(url, destination);
-    return new CachedImageMetadata(url, result.uri, extToMimeType(ext));
+    const destFile = new File(this.imagesDir, `${uuidv4()}${ext}`);
+    const file = await File.downloadFileAsync(url, destFile);
+    return new CachedImageMetadata(url, file.uri, extToMimeType(ext));
   }
 
   async fileExists(path: string): Promise<boolean> {
-    await this.ready;
-    const info = await ExpoFileSystem.getInfoAsync(path);
-    return info.exists;
+    const file = new File(path);
+    return file.exists;
   }
 
   async deleteAll(): Promise<void> {
-    await this.ready;
-    const promise = ExpoFileSystem.deleteAsync(DEST_DIRECTORY, {
-      idempotent: true,
-    }).then(() => this.prepareCacheDirectory());
-    this.ready = promise;
-    await promise;
+    this.imagesDir.delete();
+    this.imagesDir.create();
   }
 }
 
