@@ -46,5 +46,6 @@ module.exports = {
     runtimeVersion: {
       policy: 'appVersion',
     },
+    plugins: ['expo-asset', 'expo-sqlite', 'expo-font'],
   },
 };
