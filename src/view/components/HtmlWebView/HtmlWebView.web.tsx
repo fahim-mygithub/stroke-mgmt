@@ -1,10 +1,4 @@
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { useCallback, useEffect, useMemo, useRef } from 'react';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { StyleSheet } from 'react-native';
 
@@ -66,6 +60,11 @@ function flattenStyle(
   return css;
 }
 
+type IframeWindow = Window & {
+  __rnwvId?: string;
+  notifyLayout?: (p: { width: number; height: number }) => void;
+};
+
 function HtmlWebView({
   html,
   style,
@@ -74,37 +73,21 @@ function HtmlWebView({
   onScroll,
 }: Props) {
   const iframeRef = useRef<HTMLIFrameElement | null>(null);
-  const [bridgeId, setBridgeId] = useState<string | null>(null);
+  const bridgeIdRef = useRef<string | null>(null);
 
   const enriched = useMemo(() => injectBridge(html), [html]);
 
-  // Capture the bridge id the iframe generated so we only respond to its posts.
-  useEffect(() => {
-    if (!iframeRef.current) return undefined;
-    let cancelled = false;
-    const iframe = iframeRef.current;
-    const onLoad = () => {
-      if (cancelled) return;
-      try {
-        const w = iframe.contentWindow as Window & { __rnwvId?: string };
-        setBridgeId(w?.__rnwvId ?? null);
-      } catch {
-        setBridgeId(null);
-      }
-    };
-    iframe.addEventListener('load', onLoad);
-    return () => {
-      cancelled = true;
-      iframe.removeEventListener('load', onLoad);
-    };
-  }, [enriched]);
-
+  // Register message listener synchronously before the iframe's script can
+  // post anything. Using a ref for bridgeId avoids stale-closure issues where
+  // the first message arrives before React has re-rendered with the id.
   const handleMessage = useCallback(
     (e: MessageEvent) => {
       const payload = e.data as
         | { __rnwv?: string; type?: string; data?: string; y?: number }
         | undefined;
-      if (!payload || payload.__rnwv !== bridgeId) return;
+      if (!payload || typeof payload.__rnwv !== 'string') return;
+      const current = bridgeIdRef.current;
+      if (current !== null && current !== payload.__rnwv) return;
       if (payload.type === 'message' && typeof payload.data === 'string') {
         onMessage({ nativeEvent: { data: payload.data } });
       } else if (payload.type === 'scroll' && onScroll) {
@@ -113,13 +96,43 @@ function HtmlWebView({
         });
       }
     },
-    [bridgeId, onMessage, onScroll]
+    [onMessage, onScroll]
   );
 
   useEffect(() => {
     window.addEventListener('message', handleMessage);
     return () => window.removeEventListener('message', handleMessage);
   }, [handleMessage]);
+
+  // On iframe load, capture the bridge id and re-fire notifyLayout. The
+  // template's initial notifyLayout can race with this listener attachment
+  // and be dropped; re-emitting after load guarantees the parent sees a
+  // layout size at least once.
+  useEffect(() => {
+    if (!iframeRef.current) return undefined;
+    let cancelled = false;
+    const iframe = iframeRef.current;
+    const onLoad = () => {
+      if (cancelled) return;
+      try {
+        const w = iframe.contentWindow as IframeWindow;
+        bridgeIdRef.current = w?.__rnwvId ?? null;
+        if (typeof w?.notifyLayout === 'function' && w.document?.body) {
+          w.notifyLayout({
+            width: w.document.body.offsetWidth,
+            height: w.document.body.offsetHeight,
+          });
+        }
+      } catch {
+        bridgeIdRef.current = null;
+      }
+    };
+    iframe.addEventListener('load', onLoad);
+    return () => {
+      cancelled = true;
+      iframe.removeEventListener('load', onLoad);
+    };
+  }, [enriched]);
 
   const css = flattenStyle(style);
   const iframeStyle: React.CSSProperties = {
@@ -130,7 +143,9 @@ function HtmlWebView({
     ...(css as React.CSSProperties),
   };
 
-  return <iframe title="html-webview" ref={iframeRef} srcDoc={enriched} style={iframeStyle} />;
+  return (
+    <iframe title="html-webview" ref={iframeRef} srcDoc={enriched} style={iframeStyle} />
+  );
 }
 
 export { HtmlWebView };
