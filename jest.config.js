@@ -1,9 +1,8 @@
-import type { Config } from '@jest/types';
-import { pathsToModuleNameMapper } from 'ts-jest';
-import { defaults } from 'ts-jest/presets';
-import { compilerOptions } from './tsconfig.json';
+const { pathsToModuleNameMapper } = require('ts-jest');
+const { defaults } = require('ts-jest/presets');
+const { compilerOptions } = require('./tsconfig.json');
 
-const config: Config.InitialOptions = {
+module.exports = {
   ...defaults,
   preset: 'jest-expo',
   verbose: true,
@@ -14,6 +13,7 @@ const config: Config.InitialOptions = {
       {
         isolatedModules: true,
         babelConfig: true,
+        tsconfig: 'tsconfig.test.json',
       },
     ],
   },
@@ -23,5 +23,3 @@ const config: Config.InitialOptions = {
   testEnvironment: 'node',
   modulePathIgnorePatterns: ['<rootDir>/dist'],
 };
-
-export default config;

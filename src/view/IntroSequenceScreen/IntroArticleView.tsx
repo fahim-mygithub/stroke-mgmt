@@ -67,7 +67,9 @@ function IntroArticleView({
         source={{ html }}
         originWhitelist={['*']}
         onMessage={handleMessage}
-        onScroll={handleScroll}
+        // react-native-webview's WebViewScrollEvent has optional zoomScale; RN 0.83's
+        // NativeScrollEvent requires it. Cast until the library types catch up.
+        onScroll={handleScroll as unknown as WebView['props']['onScroll']}
         style={styles.webView}
       />
     ),

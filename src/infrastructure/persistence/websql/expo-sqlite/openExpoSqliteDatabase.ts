@@ -1,5 +1,7 @@
-import { openDatabase } from 'expo-sqlite';
+import { openDatabaseSync } from 'expo-sqlite';
+import { wrapSQLiteDatabase } from '@/infrastructure/persistence/websql/expo-sqlite/expoSqliteToWebsqlShim';
 
 export function openExpoSqliteDatabase() {
-  return openDatabase('database-v1.db', '1.0', '', 1000);
+  const sqliteDb = openDatabaseSync('database-v1.db');
+  return wrapSQLiteDatabase(sqliteDb);
 }

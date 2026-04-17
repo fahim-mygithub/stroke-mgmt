@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "lib": ["DOM", "ESNext"],
+    "module": "commonjs",
+    "moduleResolution": "node",
+    "jsx": "react-native",
+    "esModuleInterop": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noImplicitThis": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "allowJs": true,
+    "paths": {
+      "@/*": ["./src/*"]
+    }
+  }
+}
