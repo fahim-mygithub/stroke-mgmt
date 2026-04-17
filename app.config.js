@@ -33,6 +33,12 @@ module.exports = {
     },
     web: {
       favicon: './assets/favicon.png',
+      bundler: 'metro',
+    },
+    experiments: {
+      // Web preview is hosted under fahim-mygithub.github.io/stroke-mgmt-web-preview
+      // for Dr. Lodi's SDK-55-upgrade review. Native builds ignore this.
+      baseUrl: '/stroke-mgmt-web-preview',
     },
     extra: {
       eas: {
