@@ -1,6 +1,8 @@
 import React, { useCallback } from 'react';
-import type { WebViewMessageEvent } from 'react-native-webview';
-import WebView from 'react-native-webview';
+import {
+  HtmlWebView,
+  type HtmlWebViewMessageEvent,
+} from '@/view/components/HtmlWebView';
 import type {
   WebViewEvent,
   WebViewEventHandler,
@@ -13,20 +15,14 @@ type Props = {
 
 function AboutUsView({ html, eventHandler }: Props) {
   const handleMessage = useCallback(
-    ({ nativeEvent }: WebViewMessageEvent) => {
+    ({ nativeEvent }: HtmlWebViewMessageEvent) => {
       const event = JSON.parse(nativeEvent.data) as WebViewEvent;
       eventHandler.handle(event);
     },
     [eventHandler]
   );
 
-  return (
-    <WebView
-      source={{ html }}
-      originWhitelist={['*']}
-      onMessage={handleMessage}
-    />
-  );
+  return <HtmlWebView html={html} onMessage={handleMessage} />;
 }
 
 export { AboutUsView };

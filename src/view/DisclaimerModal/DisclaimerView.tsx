@@ -1,7 +1,9 @@
 import React, { useCallback, useMemo, useState } from 'react';
 import { useWindowDimensions, View } from 'react-native';
-import type { WebViewMessageEvent } from 'react-native-webview';
-import { WebView } from 'react-native-webview';
+import {
+  HtmlWebView,
+  type HtmlWebViewMessageEvent,
+} from '@/view/components/HtmlWebView';
 import { theme } from '@/view/theme';
 import type { WebViewEvent } from '@/infrastructure/rendering/WebViewEvent';
 import { WebViewEventHandler } from '@/infrastructure/rendering/WebViewEvent';
@@ -37,7 +39,7 @@ function DisclaimerView({ html, onPressExternalLink }: Props) {
   );
 
   const handleMessage = useCallback(
-    ({ nativeEvent }: WebViewMessageEvent) => {
+    ({ nativeEvent }: HtmlWebViewMessageEvent) => {
       const event = JSON.parse(nativeEvent.data) as WebViewEvent;
       eventHandler.handle(event);
     },
@@ -46,9 +48,8 @@ function DisclaimerView({ html, onPressExternalLink }: Props) {
 
   return (
     <View style={{ height: webViewHeight }}>
-      <WebView
-        source={{ html }}
-        originWhitelist={['*']}
+      <HtmlWebView
+        html={html}
         style={{
           width: webViewWidth,
           backgroundColor: theme.colors.background,

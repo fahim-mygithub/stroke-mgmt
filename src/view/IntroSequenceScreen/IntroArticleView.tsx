@@ -1,8 +1,10 @@
 import React, { useCallback, useMemo } from 'react';
 import { StyleSheet } from 'react-native';
-import WebView from 'react-native-webview';
-import type { WebViewMessageEvent } from 'react-native-webview';
-import type { WebViewScrollEvent } from 'react-native-webview/lib/WebViewTypes';
+import {
+  HtmlWebView,
+  type HtmlWebViewMessageEvent,
+  type HtmlWebViewScrollEvent,
+} from '@/view/components/HtmlWebView';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { ArticleId } from '@/domain/models/Article';
 import type { WebViewEvent } from '@/infrastructure/rendering/WebViewEvent';
@@ -41,15 +43,15 @@ function IntroArticleView({
   );
 
   const handleMessage = useCallback(
-    ({ nativeEvent }: WebViewMessageEvent) => {
+    ({ nativeEvent }: HtmlWebViewMessageEvent) => {
       const event = JSON.parse(nativeEvent.data) as WebViewEvent;
       eventHandler.handle(event);
     },
     [eventHandler]
   );
 
-  const handleScroll = useHeaderScrollResponder<WebViewScrollEvent>(
-    useCallback((e: WebViewScrollEvent) => e.nativeEvent.contentOffset.y, [])
+  const handleScroll = useHeaderScrollResponder<HtmlWebViewScrollEvent>(
+    useCallback((e: HtmlWebViewScrollEvent) => e.nativeEvent.contentOffset.y, [])
   );
 
   const queryClient = useQueryClient();
@@ -63,13 +65,10 @@ function IntroArticleView({
 
   const renderData = useCallback(
     (html: string) => (
-      <WebView
-        source={{ html }}
-        originWhitelist={['*']}
+      <HtmlWebView
+        html={html}
         onMessage={handleMessage}
-        // react-native-webview's WebViewScrollEvent has optional zoomScale; RN 0.83's
-        // NativeScrollEvent requires it. Cast until the library types catch up.
-        onScroll={handleScroll as unknown as WebView['props']['onScroll']}
+        onScroll={handleScroll}
         style={styles.webView}
       />
     ),

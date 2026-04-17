@@ -1,12 +1,14 @@
 import React, { useCallback } from 'react';
 import { StyleSheet, useWindowDimensions } from 'react-native';
-import type { WebViewMessageEvent } from 'react-native-webview';
-import WebView from 'react-native-webview';
+import {
+  HtmlWebView,
+  type HtmlWebViewMessageEvent,
+  type HtmlWebViewScrollEvent,
+} from '@/view/components/HtmlWebView';
 import type {
   WebViewEvent,
   WebViewEventHandler,
 } from '@/infrastructure/rendering/WebViewEvent';
-import type { WebViewScrollEvent } from 'react-native-webview/lib/WebViewTypes';
 import { useHeaderScrollResponder } from '@/view/Router/HeaderScrollContext';
 import { theme } from '@/view/theme';
 
@@ -17,7 +19,7 @@ type Props = {
 
 function ArticleView({ html, eventHandler }: Props) {
   const handleMessage = useCallback(
-    ({ nativeEvent }: WebViewMessageEvent) => {
+    ({ nativeEvent }: HtmlWebViewMessageEvent) => {
       const event = JSON.parse(nativeEvent.data) as WebViewEvent;
       eventHandler.handle(event);
     },
@@ -26,19 +28,16 @@ function ArticleView({ html, eventHandler }: Props) {
 
   const { width } = useWindowDimensions();
 
-  const handleScroll = useHeaderScrollResponder<WebViewScrollEvent>(
-    useCallback((e: WebViewScrollEvent) => e.nativeEvent.contentOffset.y, [])
+  const handleScroll = useHeaderScrollResponder<HtmlWebViewScrollEvent>(
+    useCallback((e: HtmlWebViewScrollEvent) => e.nativeEvent.contentOffset.y, [])
   );
 
   return (
-    <WebView
-      source={{ html }}
-      originWhitelist={['*']}
+    <HtmlWebView
+      html={html}
       style={[styles.webView, { width }]}
       onMessage={handleMessage}
-      // react-native-webview's WebViewScrollEvent has optional zoomScale; RN 0.83's
-      // NativeScrollEvent requires it. Cast until the library types catch up.
-      onScroll={handleScroll as unknown as WebView['props']['onScroll']}
+      onScroll={handleScroll}
     />
   );
 }
