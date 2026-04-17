@@ -4,6 +4,10 @@ const config = getDefaultConfig(__dirname);
 // resolve .ejs files
 config.resolver.assetExts.push('ejs');
 
+// expo-sqlite's web worker imports ./wa-sqlite/wa-sqlite.wasm directly; Metro's
+// default web resolver excludes .wasm from assetExts so the import fails.
+config.resolver.assetExts.push('wasm');
+
 // resolve nodejs modules as empty to silence errors from ejs package
 config.resolver.extraNodeModules['fs'] = config.resolver.emptyModulePath;
 config.resolver.extraNodeModules['path'] = config.resolver.emptyModulePath;

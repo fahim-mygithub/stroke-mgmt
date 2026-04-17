@@ -138,5 +138,10 @@ export const module = {
   Menu: ['factory', menuFactory],
 
   // BUILT-INS
-  fetch: ['value', fetch],
+  // Wrapped in an arrow to preserve `this` on the web, where `fetch` is a Window
+  // method and a bare reference throws "Illegal invocation" when called.
+  fetch: [
+    'value',
+    (...args: Parameters<typeof fetch>) => fetch(...args),
+  ],
 };
