@@ -33,16 +33,12 @@ import {
   IntroSequenceCache,
   TagCache,
 } from '@/domain/services/Cache';
-import { WebsqlCachedArticleRepository } from '@/infrastructure/persistence/websql/WebsqlCachedArticleRepository';
 import { cheerioGetImageSrcsInHtml } from '@/infrastructure/html-processing/cheerio/cheerioGetImageSrcsInHtml';
 import { cheerioReplaceImageSrcsInHtml } from '@/infrastructure/html-processing/cheerio/cheerioReplaceImageSrcsInHtml';
 import { ExpoFileSystemImageStore } from '@/infrastructure/file-system/expo-file-system/ExpoFileSystemImageStore';
-import { WebsqlCachedImageMetadataRepository } from '@/infrastructure/persistence/websql/WebsqlCachedImageMetadataRepository';
-import { openExpoSqliteDatabase } from '@/infrastructure/persistence/websql/expo-sqlite';
-import { WebsqlCachedTagRepository } from '@/infrastructure/persistence/websql/WebsqlCachedTagRepository';
 import { ClearCacheAction } from '@/application/ClearCacheAction';
-import { WebsqlCachedAlgorithmRepostiory } from '@/infrastructure/persistence/websql/WebsqlCachedAlgorithmRepository/WebsqlCachedAlgorithmRepository';
 import { Platform } from 'react-native';
+import { cachedRepositoryBindings } from '@/di/cachedRepositoryBindings';
 import { GetIntroSequenceAction } from '@/application/GetIntroSequenceAction';
 import { StrapiIntroSequenceRepository } from '@/infrastructure/persistence/strapi/StrapiIntroSequenceRepository/StrapiIntroSequenceRepository';
 import { AsyncStorageCachedIntroSequenceRepository } from '@/infrastructure/persistence/async-storage/AsyncStorageCachedIntroSequenceRepository';
@@ -111,14 +107,12 @@ export const module = {
   networkInfo: ['type', ReactNativeNetInfo],
   articleRenderer: ['factory', forward('algorithmRenderer')],
   algorithmRenderer: ['type', EjsRenderer],
-  cachedArticleRepository: ['type', WebsqlCachedArticleRepository],
   getImageSrcsInHtml: ['value', cheerioGetImageSrcsInHtml],
   replaceImageSrcsInHtml: ['value', cheerioReplaceImageSrcsInHtml],
   imageStore: ['type', ExpoFileSystemImageStore],
-  cachedImageMetadataRepository: ['type', WebsqlCachedImageMetadataRepository],
-  websqlDatabase: ['factory', openExpoSqliteDatabase],
-  cachedTagRepository: ['type', WebsqlCachedTagRepository],
-  cachedAlgorithmRepository: ['type', WebsqlCachedAlgorithmRepostiory],
+  // Native (`cachedRepositoryBindings.ts`) → Websql* repos backed by
+  // expo-sqlite. Web (`cachedRepositoryBindings.web.ts`) → IndexedDb* repos.
+  ...cachedRepositoryBindings,
   cachedIntroSequenceRepository: [
     'type',
     AsyncStorageCachedIntroSequenceRepository,
