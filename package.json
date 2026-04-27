@@ -8,6 +8,7 @@
     "android": "NODE_ENV=development expo start --android",
     "ios": "NODE_ENV=development expo start --ios",
     "web": "expo start --web",
+    "build:web": "expo export -p web && node scripts/postBuildWeb.js",
     "eject": "expo eject",
     "test": "jest",
     "lint": "eslint .",

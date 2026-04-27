@@ -23,7 +23,7 @@ First cycle after handoff from Sam. One-version major bump, plus a repair of the
 The web export had never worked. SDK 55 exposed a chain of issues:
 
 1. **`expo-sqlite/web` imports `wa-sqlite.wasm`** — Metro's web resolver doesn't include `.wasm` in `assetExts` by default. Fix: `config.resolver.assetExts.push('wasm')` in `metro.config.js`.
-2. **`expo-sqlite/web` requires `SharedArrayBuffer`** — only available in cross-origin-isolated contexts (COOP + COEP headers). Hosting constraint we didn't want to impose on every deploy target, so we punted: `openExpoSqliteDatabase.web.ts` returns a no-op Database. The WebSQL caches are an optimization; web loads go straight to Strapi.
+2. **`expo-sqlite/web` requires `SharedArrayBuffer`** — only available in cross-origin-isolated contexts (COOP + COEP headers). Hosting constraint we didn't want to impose on every deploy target, so the seam moved up to the cached-repo level: web binds IndexedDB-native repos (`src/infrastructure/persistence/indexeddb/`) via `cachedRepositoryBindings.web.ts`, native keeps the WebSQL stack via `cachedRepositoryBindings.ts`. The historical no-op `openExpoSqliteDatabase.web.ts` is gone.
 3. **`expo-file-system` `new File()` / `Paths.cache` throws `validatePath is not a function` on web** — the File/Directory class API isn't fully implemented for web. Adapters: `ExpoFileSystemImageStore.web.ts` uses an in-memory `Map` and `fetch + FileReader`; `ExpoAssetFileSystem.web.ts` uses `fetch(uri).text()`.
 4. **`fetch: ['value', fetch]` in `di/dependencies.ts` throws "Illegal invocation" on web** — `Window.fetch` needs its `this`. Wrapped in an arrow. Harmless on native.
 5. **`react-native-webview` renders "WebView does not support this platform" on web** — Added `src/view/components/HtmlWebView` with a native variant (wraps react-native-webview) and a `.web.tsx` variant (iframe + injected `postMessage` bridge). Refactored the six call sites to use it.
@@ -66,3 +66,90 @@ node dev-serve-web.js 3000        # local static server with COOP/COEP
 - `eas build --profile preview` — requires Sam to add the maintainer to the EAS team for project `935f864e-12bb-456a-8214-8070b8ba5baa`.
 - `eas submit` to App Store / Play Store — requires Apple Developer + Google Play Console membership from Sam.
 - Native emulator/device verification — planned but gated on a working Android/iOS environment for this maintainer.
+
+---
+
+## 2026 — Visual & responsiveness pass (Fahim, post SDK bump)
+
+Eight-phase visual audit run on the `expo-sdk-upgrade-2026` branch after the SDK 54→55 upgrade landed. Design doc: `docs/plans/2026-04-19-stroke-mgmt-visual-audit-design.md`.
+
+### What broke and why
+
+| Symptom | Root cause | Fix |
+| --- | --- | --- |
+| Web build crashes on load with `TypeError: Cannot read properties of undefined (reading 'from')` | `safe-buffer` imports `buffer`, which wasn't in node_modules. Metro's web bundle substituted an empty stub module, so `buffer.Buffer` was undefined. `sha.js` (used by `StrapiPlaceholderImageRepository`) pulls in `safe-buffer` eagerly at DI wire-up. | `yarn add buffer` — add as an explicit root dep. Before this cycle it arrived transitively through a package that no longer depends on it |
+| Raw HTML tags leaking as visible text in scored algorithm switch descriptions | `Text` component rendered the description HTML string literally | Pass description HTML through `RichContentView` like any other Strapi markup |
+| Grid cards bleeding/overlapping between rows when content length varied | `flexGrow: 1` + `flexBasis` makes flex items stretch to fill rows, but short-content cards render shorter than their allocated flex height, and the subsequent row starts overlapping | Fixed-width grid cards (`width: 200`), rely on `flexWrap` for wrapping |
+
+### What landed
+
+1. **Foundation** — extended the existing `src/view/theme/` (kept the MD3 token names and the green primary `#478e3e`). Added `colors.semantic` (critical/caution/stable/info + `.bg`/`.border` variants), `spaces.xxl`/`xxxl`, `breakpoints.width.desktop`. Bound Inter to `fonts.*` via `@expo-google-fonts/inter` + `useFonts` gating in `Root.tsx`. Bumped heading weights 400→600 and tightened display letter-spacing. New `components/Screen.tsx` wrapper centralizes responsive centering with configurable max-width; applied to Home, Article, Algorithm, and AboutUs screens.
+2. **Core primitives** — new `Card` (shadow + radius + press-scale via `Animated`), new `Chip` (5 semantic variants × 2 sizes). `Button` gained `variant`/`size`/`leadingIcon`/`trailingIcon`/`disabled` (backward compatible with the legacy color props). `IconButton` already met the 44×44 HIG target — no change.
+3. **`RichContentView`** — `react-native-render-html@6.3` wrapper that replaces the iframe bridge everywhere. Handles `h1/h2/h3/p/ul/ol/li/strong/em/blockquote/code/img/a`. Link clicks route via `onPressLink`/`onPressArticleLink` callbacks (detects `article:<id>` scheme for in-app navigation).
+4. **Algorithm redesign** — `TextAlgorithmView` + `ScoredAlgorithmView` render from the domain object directly (no more `html` → iframe round trip). Outcomes are `Card`s with chevrons. `ScoredAlgorithmView` shows switches as native level buttons with active-level highlight + a reactive score bar. The "dead-whitespace bug" below algorithm body that prompted this audit is structurally killed — there is no iframe anymore.
+5. **Article / IntroArticle / Disclaimer migration** — all HTML call sites now render natively via `RichContentView`.
+6. **Home grid** — Algorithm list becomes a responsive layout: horizontal swipe strip below 680px wide, wrapping fixed-width grid above that. Cards use the `Card` primitive.
+7. **Cleanup** — deleted `src/view/components/HtmlWebView/*`, removed `react-native-webview` from deps (no longer referenced). `WebViewEvent*` types kept — `RichContentView` callbacks reuse those for the event-handler bridge.
+
+### Decisions worth knowing next cycle
+
+- **Kept the green primary.** Earlier design review assumed the app was indigo-branded; it's actually green (`#478e3e`) with a muted slate-blue secondary for algorithm buttons. The visual pass extended the existing palette rather than re-skinning.
+- **No severity chip on algorithm outcomes.** Clinical judgment: the doc chooses the branch based on their assessment; encoding severity into the branch button would let the UI editorialize a medical decision. All outcome Cards get identical neutral treatment.
+- **Algorithm HTML is now rendered from the domain object directly.** The EJS `textAlgorithm.ejs` / `scoredAlgorithm.ejs` templates are still produced by `RenderAlgorithmAction` (other code may rely on the HTML shape), but the view path no longer consumes them. If the EJS templates end up fully orphaned, they can be deleted in a future cleanup.
+- **Article hero image + related-articles footer were deferred.** Would require a new action to expose the full `Article` object alongside the rendered HTML. Scope call, not a blocker.
+
+### Version jumps this cycle
+
+- Added: `@expo-google-fonts/inter@0.4.2`, `buffer@6.0.3`, `ieee754@1.2.1`, `react-native-render-html@6.3.4` (+ its transitive deps).
+- Removed: `react-native-webview@13.16.0`.
+
+### Commands used this cycle
+
+```sh
+yarn add @expo-google-fonts/inter
+yarn add buffer                       # the regression fix documented above
+yarn add react-native-render-html
+yarn remove react-native-webview
+npx tsc --noEmit
+npx jest                              # still 129/133 — same pre-existing EjsRenderer snapshot drift
+npx expo export --platform web
+```
+
+---
+
+## 2026 — Web offline path: Service Worker + PWA manifest (Fahim)
+
+Layered on top of the IndexedDB content cache (which handles CMS JSON), this phase makes the web build installable as a PWA and adds an asset-layer offline cache. Design doc: `docs/plans/2026-04-27-stroke-mgmt-offline-pwa-design.md` — section "Service Worker + manifest".
+
+### What landed
+
+- **`web/service-worker.js`** — three-event lifecycle:
+  - `install`: fetches `precache-manifest.json` (generated at build time) and `cache.addAll`s the listed app-shell URLs into a versioned cache (`stroke-mgmt-app-shell-<buildHash>`).
+  - `activate`: deletes any `stroke-mgmt-app-shell-*` cache whose key doesn't match the current build hash.
+  - `fetch`: routes by URL — CMS image bytes (`stroke-mgmt-cms.a2hosted.com/uploads/*`) get stale-while-revalidate against a long-lived `stroke-mgmt-cms-images-v1` cache; same-origin requests under the baseUrl get cache-first against the precache; everything else (CMS API JSON in particular) passes through untouched. The IndexedDB layer remains the single source of truth for CMS JSON — the SW deliberately does not double-cache it.
+- **`web/manifest.webmanifest`** — name "Ischemic Stroke", short name "Stroke", `display: standalone`, scope + `start_url` set to `/stroke-mgmt-web-preview/` to match `experiments.baseUrl`. `theme_color: #478e3e` (the brand green from `src/view/theme/colors.ts`), `background_color: #fafafa` (matches the surface color).
+- **`web/icons/icon-192.png`, `icon-512.png`** — properly resized from `assets/icon.png` (600×600 source) using ffmpeg with the `lanczos` scaler (`ffmpeg -i assets/icon.png -vf scale=192:192:flags=lanczos web/icons/icon-192.png`, same for 512). Regenerate the same way if the source logo changes.
+- **`scripts/postBuildWeb.js`** — runs after `expo export -p web`:
+  1. Recursively copies `web/` into `dist/`.
+  2. Walks `dist/`, computes a sha1-8 content hash of each file, and writes `dist/precache-manifest.json` (`[{url, revision}]` entries; sorted; SW + manifest excluded so the SW doesn't try to cache itself).
+  3. Computes a build hash (sha1-8 of all asset hashes concatenated) and replaces the `__BUILD_HASH__` token in `dist/service-worker.js`.
+  4. Injects `<link rel="manifest">`, `<link rel="apple-touch-icon">`, and `<meta name="theme-color">` into `dist/index.html` head. Idempotent — safe to re-run.
+- **`src/registerServiceWorker.ts` / `.web.ts`** — the standard Metro `.web.ts` platform-split pattern (mirrors `cachedRepositoryBindings.web.ts`). Native variant is a no-op; web variant registers `/stroke-mgmt-web-preview/service-worker.js` on `window.load`. The baseUrl is hardcoded — Expo doesn't surface `experiments.baseUrl` as a runtime env var. TODO: lift to `EXPO_PUBLIC_BASE_URL` if the hosting path ever needs to change per-deploy.
+- **`src/index.ts`** — single-line addition: `import { registerServiceWorker } from '@/registerServiceWorker'; registerServiceWorker();`. Metro's `.web.ts` extension handles the platform split, so `src/index.ts` itself stays platform-neutral.
+- **`package.json`** — added `"build:web": "expo export -p web && node scripts/postBuildWeb.js"`. Existing scripts untouched.
+
+### Verification
+
+```sh
+yarn tsc --noEmit -p tsconfig.json    # clean
+yarn build:web                        # 55 precache entries, buildHash 122e2f44
+yarn test                             # 22/27 suites pass — same pre-existing failures
+                                      # (EjsRenderer snapshots + jest worker crashes
+                                      # documented above); no new failures from this phase
+```
+
+After `yarn build:web` you should see `dist/service-worker.js` with `__BUILD_HASH__` replaced, `dist/manifest.webmanifest`, `dist/icons/icon-{192,512}.png`, `dist/precache-manifest.json`, and the link tags inside `dist/index.html`.
+
+### Known follow-ups
+
+- End-to-end PWA verification (Lighthouse PWA audit, install prompt, offline reload) is the next task — gated on hosting the new build.
