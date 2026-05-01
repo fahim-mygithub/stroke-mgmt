@@ -109,7 +109,15 @@ async function staleWhileRevalidate(request) {
 
 async function cacheFirst(request) {
   const cache = await caches.open(APP_SHELL_CACHE);
-  const cached = await cache.match(request);
+  // Direct match first.
+  let cached = await cache.match(request);
+  // Static-host convention: directory-style URLs serve `index.html` from the same path.
+  // The precache lists `index.html` (relative), not the bare scope URL, so navigations
+  // to e.g. `…/stroke-mgmt-web-preview/` need this fallback to hit the precached shell.
+  if (!cached && request.mode === 'navigate') {
+    const indexUrl = new URL('index.html', self.registration.scope).toString();
+    cached = await cache.match(indexUrl);
+  }
   if (cached) return cached;
   try {
     const response = await fetch(request);
@@ -118,9 +126,10 @@ async function cacheFirst(request) {
     }
     return response;
   } catch (err) {
-    // For navigations, fall back to the cached shell index if we have one.
+    // Network failed. Last-ditch fallback for navigations: serve the cached shell.
     if (request.mode === 'navigate') {
-      const fallback = await cache.match(new URL(self.registration.scope).toString());
+      const indexUrl = new URL('index.html', self.registration.scope).toString();
+      const fallback = await cache.match(indexUrl);
       if (fallback) return fallback;
     }
     throw err;
