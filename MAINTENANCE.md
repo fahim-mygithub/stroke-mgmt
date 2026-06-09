@@ -21,6 +21,27 @@ Mid-cycle bump, done so the app can be tested on physical phones with free Expo 
 
 Also regenerated the 4 stale EjsRenderer snapshots (`var` → `const`) that were left over from last cycle.
 
+### Runtime errors found during Android device testing
+
+The type-check/test/web-export checks above all passed, but the native app
+still threw at runtime on a real (emulated) Android device. These only
+surface when the JS actually runs on Hermes against the native modules, so
+**always smoke-test on a device, not just `tsc`/`jest`:**
+
+| Symptom (on device) | Root cause | Fix |
+| --- | --- | --- |
+| `Android Bundling failed … safe-buffer attempted to import the Node standard library module "buffer"` | SDK 56's Hermes/Metro no longer auto-polyfills Node's `buffer` builtin; `sha.js → safe-buffer` requires it | Added `buffer@6.0.3` + `ieee754@1.2.1` as direct deps (same shim the SDK-55 web build used) |
+| Red box: `cannot start a transaction within a transaction` / `cannot rollback - no transaction is active` | expo-sqlite v56 stopped serializing concurrent `withTransactionAsync` calls on one connection; overlapping WebSQL transactions collided | `expoSqliteToWebsqlShim.ts` now chains every transaction onto a single `serialQueue` promise (WebSQL is serial-per-db anyway) |
+| App hung on the loading spinner forever | `ReactNativeNetInfo.retry` never decremented `maxTries`, so when netinfo reported `isInternetReachable: null` it recursed forever and every cache lookup hung | Cap the recursion; when reachability stays unknown, fall back to `isConnected` instead of forcing offline |
+
+**Known non-fatal (pre-existing, not from this cycle):** browsing images
+logs `UNIQUE constraint failed: cachedImageMetadata.sourceUrl`. It's a
+check-then-insert race in `WebsqlCachedImageMetadataRepository.save()` when
+two concurrent loads of the same uncached image both pass `exists()` then
+both INSERT. Images still display (fall back to source URL), and it's a
+dev-only LogBox overlay — production builds don't show it. Left for a future
+cycle; the clean fix is `INSERT OR REPLACE` or de-duping in-flight saves.
+
 ### Version jumps this cycle
 
 - expo: ^55.0.15 → ^56.0.0 (all `expo-*` packages to ~56.0.x)
@@ -36,13 +57,37 @@ Also regenerated the 4 stale EjsRenderer snapshots (`var` → `const`) that were
 - `npx tsc --noEmit` — clean
 - `npx jest` — 23/27 suites; the remaining 4 fail as worker-child crashes, pre-existing since before the handoff
 - `npx expo export --platform web` — bundles cleanly
+- **Android device smoke test (Expo Go SDK 56, `Medium_Phone_API_36.1` AVD)** — after the runtime fixes above: intro sequence, disclaimer modal, home screen (Algorithms carousel + Articles tag filters), article WebView with images, and an interactive algorithm (Start Triaging) all render from the live production CMS. No errors in the Metro log.
 
 ### Testing on physical devices (free Expo Go path)
 
 Start the dev server with `yarn dev` (tunnel mode — phone does not need to be on the same network).
 
 - **Android**: install Expo Go from https://expo.dev/go (pick SDK 56) — the Play Store version is stuck on SDK 54. Then scan the QR code from the dev server.
-- **iPhone**: install TestFlight from the App Store, then join the Expo Go SDK 56 beta at https://testflight.apple.com/join/GZJxxfUU. Then scan the QR code with the Camera app.
+- **iPhone**: install TestFlight from the App Store, then join the Expo Go SDK 56 beta at https://testflight.apple.com/join/GZJxxfUU. Then scan the QR code with the Camera app. NOTE (June 2026): the public TestFlight beta has been hitting Apple's 10k-tester cap — if it says "beta is full", retry over a few days or use `eas go` once Apple Developer access lands.
+
+### Testing on an Android emulator (no physical device needed)
+
+This is how the SDK-56 cycle was actually verified. With Android Studio installed:
+
+```sh
+# 1. boot an AVD (any recent system image; this cycle used Medium_Phone_API_36.1)
+%LOCALAPPDATA%\Android\Sdk\emulator\emulator.exe -avd <avd-name>
+
+# 2. start Metro and install/launch Expo Go on the emulator
+#    expo auto-installs the matching SDK-56 Expo Go on first run
+npx expo start --android          # NODE_ENV defaults to production -> live CMS
+#    use `yarn dev` instead to point at a local Strapi at 10.0.2.2:1337
+
+# if the QR/deep-link doesn't connect, forward the Metro port and open by hand:
+adb reverse tcp:8081 tcp:8081
+adb shell am start -a android.intent.action.VIEW -d "exp://localhost:8081"
+```
+
+`10.0.2.2` is the host loopback from inside the emulator — that's why
+`dependencies.ts` uses it for the dev Strapi URL. For headless inspection:
+`adb exec-out screencap -p > shot.png` and `adb shell uiautomator dump` to
+get tappable element bounds.
 
 ---
 
