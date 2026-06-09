@@ -11,8 +11,16 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
   <title>hello world</title>
   <style>
     body {
-      font-family: Arial, Helvetica, sans-serif;
-      background-color: #fafafa;
+      font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+      background-color: transparent;
+      color: #0B1220;
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    a {
+      color: #1E4E8C;
     }
 
     iframe,
@@ -20,10 +28,39 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
       width: 100%;
     }
 
+    img {
+      border-radius: 10px;
+    }
+
+    h1 {
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      font-size: 18px;
+      font-weight: 700;
+    }
+
+    ul,
+    ol {
+      padding-left: 22px;
+    }
+
     blockquote {
       position: relative;
       margin: 0;
       padding: 16px 32px;
+      border-radius: 0 10px 10px 0;
+      background-color: #F3F7FB;
     }
 
     blockquote::before {
@@ -34,23 +71,23 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
       left: 0;
       width: 4px;
       height: 100%;
-      background-color: #3c7590;
+      background-color: #1E4E8C;
     }
 
     table {
       border-collapse: collapse;
       border-spacing: 0px;
-      border-radius: 4px;
+      border-radius: 10px;
     }
 
     table,
     th,
     td {
-      border: 1px solid #c9cfc9;
+      border: 1px solid #E4E7EB;
     }
 
     thead {
-      background-color: #dbe9f0;
+      background-color: #EAF0F8;
     }
 
     tr {
@@ -58,7 +95,7 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
     }
 
     thead th {
-      color: #0f1d24;
+      color: #0B1220;
     }
 
     td,
@@ -104,7 +141,8 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
 
     .iframe__wrapper--offline,
     .iframe__wrapper--loading {
-      border: 1px dashed black;
+      border: 1px dashed #E4E7EB;
+      border-radius: 10px;
       position: relative;
     }
 
@@ -114,10 +152,10 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      color: #667085;
       /* body-large */
       line-height: 24px;
       font-size: 16px;
-      letter-spacing: 0.5px;
       font-weight: 400;
     }
 
@@ -141,6 +179,8 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
       align-self: flex-end;
       margin-right: 16px;
       text-align: right;
+      color: #667085;
+      font-size: 12px;
     }
 
     .template.citations {
@@ -151,7 +191,7 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
       list-style: none;
       cursor: pointer;
       user-select: none;
-      color: #0f1d24;
+      color: #667085;
       /* label-large */
       line-height: 20px;
       font-size: 14px;
@@ -182,10 +222,10 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
 
     .template.citations__item {
       margin-top: 16px;
-      /* body-large */
-      line-height: 24px;
-      font-size: 16px;
-      letter-spacing: 0.5;
+      color: #667085;
+      /* body-medium */
+      line-height: 1.5;
+      font-size: 13px;
       font-weight: 400;
     }
   </style>
@@ -338,28 +378,60 @@ exports[`EjsAlgorithmRenderer Behavior should render disclaimer html 1`] = `
   <title>hello world</title>
   <style>
     body {
-      background-color: #fafafa;
-      font-family: Arial, Helvetica, sans-serif;
+      background-color: transparent;
+      color: #0B1220;
+      font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+      font-size: 16px;
+      line-height: 1.7;
+      -webkit-font-smoothing: antialiased;
     }
 
     * {
       margin: 0;
       padding: 0;
       box-sizing: border-box;
-      font-family: Arial, Helvetica, sans-serif;
+      font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+
+    a {
+      color: #1E4E8C;
     }
 
     h1 {
       margin-bottom: 16px;
+      font-size: 34px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
+      line-height: 1.15;
+    }
+
+    h2 {
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+    }
+
+    h3 {
+      font-size: 18px;
+      font-weight: 700;
     }
 
     p {
       text-align: left;
     }
 
+    ul,
+    ol {
+      padding-left: 22px;
+    }
+
     iframe,
     img {
       width: 100%;
+    }
+
+    img {
+      border-radius: 10px;
     }
 
     .iframe__wrapper {
@@ -369,7 +441,8 @@ exports[`EjsAlgorithmRenderer Behavior should render disclaimer html 1`] = `
 
     .iframe__wrapper--offline,
     .iframe__wrapper--loading {
-      border: 1px dashed black;
+      border: 1px dashed #E4E7EB;
+      border-radius: 10px;
       position: relative;
     }
 
@@ -379,10 +452,10 @@ exports[`EjsAlgorithmRenderer Behavior should render disclaimer html 1`] = `
       top: 50%;
       left: 50%;
       transform: translate(-50%, -50%);
+      color: #667085;
       /* body-large */
       line-height: 24px;
       font-size: 16px;
-      letter-spacing: 0.5px;
       font-weight: 400;
     }
 
@@ -531,8 +604,16 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
   body {
     margin: 0 16px;
     padding: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background-color: #fafafa;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background-color: transparent;
+    color: #0B1220;
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a {
+    color: #1E4E8C;
   }
 
   iframe,
@@ -540,10 +621,39 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
     width: 100%;
   }
 
+  img {
+    border-radius: 10px;
+  }
+
+  h1 {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  ul,
+  ol {
+    padding-left: 22px;
+  }
+
   blockquote {
     position: relative;
     margin: 0;
     padding: 16px 32px;
+    border-radius: 0 10px 10px 0;
+    background-color: #F3F7FB;
   }
 
   blockquote::before {
@@ -554,23 +664,23 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
     left: 0;
     width: 4px;
     height: 100%;
-    background-color: #3c7590;
+    background-color: #1E4E8C;
   }
 
   table {
     border-collapse: collapse;
     border-spacing: 0px;
-    border-radius: 4px;
+    border-radius: 10px;
   }
 
   table,
   th,
   td {
-    border: 1px solid #c9cfc9;
+    border: 1px solid #E4E7EB;
   }
 
   thead {
-    background-color: #dbe9f0;
+    background-color: #EAF0F8;
   }
 
   tr {
@@ -578,7 +688,7 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
   }
 
   thead th {
-    color: #0f1d24;
+    color: #0B1220;
   }
 
   td,
@@ -634,18 +744,18 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
   .template.header__title {
     margin: 0;
     padding-top: 16px;
-    /* headline-medium */
-    line-height: 36px;
+    /* screen title */
+    line-height: 1.2;
     font-size: 28px;
-    font-weight: 400;
+    letter-spacing: -0.02em;
+    font-weight: 700;
   }
 
   .template.body__paragraph {
     margin-top: 16px;
     /* body-large */
-    line-height: 24px;
+    line-height: 1.7;
     font-size: 16px;
-    letter-spacing: 0.5px;
     font-weight: 400;
   }
 
@@ -670,10 +780,10 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
     display: none;
     position: absolute;
     top: 100%;
-    background-color: #111111;
-    color: #eeeeee;
-    padding: 4px;
-    border-radius: 4px;
+    background-color: #0B1220;
+    color: #FFFFFF;
+    padding: 8px 12px;
+    border-radius: 10px;
     z-index: 999;
     /* body-small */
     line-height: 16px;
@@ -704,44 +814,46 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
     visibility: hidden;
   }
 
-  .template.switches__group-label,
-  .template.switches__radio-label {
-    /* body-large */
+  .template.switches__group-label {
+    /* title-medium */
     line-height: 24px;
-    font-size: 16px;
-    letter-spacing: 0.5px;
-    font-weight: 400;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0B1220;
+  }
+
+  .template.switches__radio-label {
+    /* label-large */
+    line-height: 20px;
+    font-size: 13px;
+    font-weight: 500;
   }
 
   .template.switches__radiogroup {
     display: flex;
     flex-direction: row;
-    border-radius: 999px;
-    border: 1px solid #478e3e;
-    overflow: hidden;
+    flex-wrap: wrap;
+    gap: 6px;
   }
 
   .template.switches__level {
-    flex: 1;
-    padding: 8px;
-  }
-
-  .template.switches__level:first-child {
-    padding-left: 16px;
-  }
-
-  .template.switches__level:last-child {
-    padding-right: 16px;
+    border-radius: 10px;
+    border: 1px solid #E4E7EB;
+    background-color: #FFFFFF;
+    color: #475467;
   }
 
   .template.switches__level--checked {
-    background-color: #478e3e;
+    background-color: #1E4E8C;
+    border-color: #1E4E8C;
     color: white;
+    box-shadow: 0 0 0 3px #EAF0F8;
   }
 
   .template.switches__radio-label {
     display: inline-block;
-    width: 2em;
+    min-width: 44px;
+    padding: 8px 14px;
     text-align: center;
   }
 
@@ -754,31 +866,32 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
   .template.outcomes__headline {
     margin: 0;
     margin-top: 16px;
-    text-align: right;
-    /* label-large */
-    line-height: 20px;
-    font-size: 14px;
-    letter-spacing: 0.1;
-    font-weight: 500;
-  }
-
-  .template.outcomes__list-item {
-    margin-top: 8px;
-  }
-
-  .template.outcomes__title {
     /* title-medium */
     line-height: 24px;
     font-size: 16px;
-    letter-spacing: 0.15px;
-    font-weight: 500;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+    color: #0B1220;
+  }
+
+  .template.outcomes__list-item {
+    margin-top: 10px;
+  }
+
+  .template.outcomes__title {
+    /* card title */
+    line-height: 24px;
+    font-size: 15px;
+    letter-spacing: -0.005em;
+    font-weight: 600;
+    color: #0B1220;
   }
 
   .template.outcomes__item {
-    padding: 16px;
-    border: 1px solid #3c7590;
-    border-radius: 20px;
-    background-color: #3c7590;
+    padding: 16px 18px;
+    border: 1px solid #E4E7EB;
+    border-radius: 10px;
+    background-color: #FFFFFF;
   }
 
   .template.outcomes__item>summary {
@@ -786,39 +899,41 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
   }
 
   .template.outcomes__item[open] {
-    background-color: #dbe9f0;
+    border-color: #667085;
+    box-shadow: 0 4px 8px -2px rgba(16, 24, 40, .06), 0 2px 4px -2px rgba(16, 24, 40, .04);
   }
 
   .template.outcomes__item .template.outcomes__title {
-    color: white;
+    color: #0B1220;
   }
 
   .template.outcomes__item[open] .template.outcomes__title {
-    color: #3c7590;
+    color: #0B1220;
   }
 
   .template.outcomes__item--empty {
-    background-color: inherit;
+    background-color: transparent;
     border-style: dashed;
   }
 
   .template.outcomes__body {
-    margin-top: 16px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #EEF0F3;
   }
 
   .template.outcomes__button {
-    background-color: #478e3e;
+    background-color: #1E4E8C;
     color: white;
-    border-radius: 999px;
-    border: 1px solid #478e3e;
+    border-radius: 10px;
+    border: 1px solid #1E4E8C;
     height: 40px;
-    padding: 0 24px;
+    padding: 0 18px;
     margin-top: 16px;
     /* label-large */
     line-height: 20px;
     font-size: 14px;
-    letter-spacing: 0.1px;
-    font-weight: 500;
+    font-weight: 600;
   }
 
   .iframe__wrapper {
@@ -828,7 +943,8 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
 
   .iframe__wrapper--offline,
   .iframe__wrapper--loading {
-    border: 1px dashed black;
+    border: 1px dashed #E4E7EB;
+    border-radius: 10px;
     position: relative;
   }
 
@@ -838,10 +954,10 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    color: #667085;
     /* body-large */
     line-height: 24px;
     font-size: 16px;
-    letter-spacing: 0.5px;
     font-weight: 400;
   }
 
@@ -864,6 +980,8 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
     margin-right: 16px;
     margin-top: 16px;
     text-align: right;
+    color: #667085;
+    font-size: 12px;
   }
 
   .template.citations {
@@ -874,7 +992,7 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
     list-style: none;
     cursor: pointer;
     user-select: none;
-    color: #0f1d24;
+    color: #667085;
     /* label-large */
     line-height: 20px;
     font-size: 14px;
@@ -905,10 +1023,10 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
 
   .template.citations__item {
     margin-top: 16px;
-    /* body-large */
-    line-height: 24px;
-    font-size: 16px;
-    letter-spacing: 0.5;
+    color: #667085;
+    /* body-medium */
+    line-height: 1.5;
+    font-size: 13px;
     font-weight: 400;
   }
 </style>
@@ -1272,8 +1390,16 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
   body {
     margin: 0 16px;
     padding: 0;
-    font-family: Arial, Helvetica, sans-serif;
-    background-color: #fafafa;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background-color: transparent;
+    color: #0B1220;
+    font-size: 16px;
+    line-height: 1.7;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a {
+    color: #1E4E8C;
   }
 
   iframe,
@@ -1281,10 +1407,39 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
     width: 100%;
   }
 
+  img {
+    border-radius: 10px;
+  }
+
+  h1 {
+    font-size: 34px;
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    line-height: 1.15;
+  }
+
+  h2 {
+    font-size: 22px;
+    font-weight: 700;
+    letter-spacing: -0.01em;
+  }
+
+  h3 {
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  ul,
+  ol {
+    padding-left: 22px;
+  }
+
   blockquote {
     position: relative;
     margin: 0;
     padding: 16px 32px;
+    border-radius: 0 10px 10px 0;
+    background-color: #F3F7FB;
   }
 
   blockquote::before {
@@ -1295,23 +1450,23 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
     left: 0;
     width: 4px;
     height: 100%;
-    background-color: #3c7590;
+    background-color: #1E4E8C;
   }
 
   table {
     border-collapse: collapse;
     border-spacing: 0px;
-    border-radius: 4px;
+    border-radius: 10px;
   }
 
   table,
   th,
   td {
-    border: 1px solid #c9cfc9;
+    border: 1px solid #E4E7EB;
   }
 
   thead {
-    background-color: #dbe9f0;
+    background-color: #EAF0F8;
   }
 
   tr {
@@ -1319,7 +1474,7 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
   }
 
   thead th {
-    color: #0f1d24;
+    color: #0B1220;
   }
 
   td,
@@ -1375,18 +1530,18 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
   .template.header__title {
     margin: 0;
     padding-top: 16px;
-    /* headline-medium */
-    line-height: 36px;
+    /* screen title */
+    line-height: 1.2;
     font-size: 28px;
-    font-weight: 400;
+    letter-spacing: -0.02em;
+    font-weight: 700;
   }
 
   .template.body__paragraph {
     margin-top: 16px;
     /* body-large */
-    line-height: 24px;
+    line-height: 1.7;
     font-size: 16px;
-    letter-spacing: 0.5px;
     font-weight: 400;
   }
 
@@ -1411,10 +1566,10 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
     display: none;
     position: absolute;
     top: 100%;
-    background-color: #111111;
-    color: #eeeeee;
-    padding: 4px;
-    border-radius: 4px;
+    background-color: #0B1220;
+    color: #FFFFFF;
+    padding: 8px 12px;
+    border-radius: 10px;
     z-index: 999;
     /* body-small */
     line-height: 16px;
@@ -1445,44 +1600,46 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
     visibility: hidden;
   }
 
-  .template.switches__group-label,
-  .template.switches__radio-label {
-    /* body-large */
+  .template.switches__group-label {
+    /* title-medium */
     line-height: 24px;
-    font-size: 16px;
-    letter-spacing: 0.5px;
-    font-weight: 400;
+    font-size: 14px;
+    font-weight: 600;
+    color: #0B1220;
+  }
+
+  .template.switches__radio-label {
+    /* label-large */
+    line-height: 20px;
+    font-size: 13px;
+    font-weight: 500;
   }
 
   .template.switches__radiogroup {
     display: flex;
     flex-direction: row;
-    border-radius: 999px;
-    border: 1px solid #478e3e;
-    overflow: hidden;
+    flex-wrap: wrap;
+    gap: 6px;
   }
 
   .template.switches__level {
-    flex: 1;
-    padding: 8px;
-  }
-
-  .template.switches__level:first-child {
-    padding-left: 16px;
-  }
-
-  .template.switches__level:last-child {
-    padding-right: 16px;
+    border-radius: 10px;
+    border: 1px solid #E4E7EB;
+    background-color: #FFFFFF;
+    color: #475467;
   }
 
   .template.switches__level--checked {
-    background-color: #478e3e;
+    background-color: #1E4E8C;
+    border-color: #1E4E8C;
     color: white;
+    box-shadow: 0 0 0 3px #EAF0F8;
   }
 
   .template.switches__radio-label {
     display: inline-block;
-    width: 2em;
+    min-width: 44px;
+    padding: 8px 14px;
     text-align: center;
   }
 
@@ -1495,31 +1652,32 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
   .template.outcomes__headline {
     margin: 0;
     margin-top: 16px;
-    text-align: right;
-    /* label-large */
-    line-height: 20px;
-    font-size: 14px;
-    letter-spacing: 0.1;
-    font-weight: 500;
-  }
-
-  .template.outcomes__list-item {
-    margin-top: 8px;
-  }
-
-  .template.outcomes__title {
     /* title-medium */
     line-height: 24px;
     font-size: 16px;
-    letter-spacing: 0.15px;
-    font-weight: 500;
+    letter-spacing: -0.01em;
+    font-weight: 600;
+    color: #0B1220;
+  }
+
+  .template.outcomes__list-item {
+    margin-top: 10px;
+  }
+
+  .template.outcomes__title {
+    /* card title */
+    line-height: 24px;
+    font-size: 15px;
+    letter-spacing: -0.005em;
+    font-weight: 600;
+    color: #0B1220;
   }
 
   .template.outcomes__item {
-    padding: 16px;
-    border: 1px solid #3c7590;
-    border-radius: 20px;
-    background-color: #3c7590;
+    padding: 16px 18px;
+    border: 1px solid #E4E7EB;
+    border-radius: 10px;
+    background-color: #FFFFFF;
   }
 
   .template.outcomes__item>summary {
@@ -1527,39 +1685,41 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
   }
 
   .template.outcomes__item[open] {
-    background-color: #dbe9f0;
+    border-color: #667085;
+    box-shadow: 0 4px 8px -2px rgba(16, 24, 40, .06), 0 2px 4px -2px rgba(16, 24, 40, .04);
   }
 
   .template.outcomes__item .template.outcomes__title {
-    color: white;
+    color: #0B1220;
   }
 
   .template.outcomes__item[open] .template.outcomes__title {
-    color: #3c7590;
+    color: #0B1220;
   }
 
   .template.outcomes__item--empty {
-    background-color: inherit;
+    background-color: transparent;
     border-style: dashed;
   }
 
   .template.outcomes__body {
-    margin-top: 16px;
+    margin-top: 14px;
+    padding-top: 14px;
+    border-top: 1px solid #EEF0F3;
   }
 
   .template.outcomes__button {
-    background-color: #478e3e;
+    background-color: #1E4E8C;
     color: white;
-    border-radius: 999px;
-    border: 1px solid #478e3e;
+    border-radius: 10px;
+    border: 1px solid #1E4E8C;
     height: 40px;
-    padding: 0 24px;
+    padding: 0 18px;
     margin-top: 16px;
     /* label-large */
     line-height: 20px;
     font-size: 14px;
-    letter-spacing: 0.1px;
-    font-weight: 500;
+    font-weight: 600;
   }
 
   .iframe__wrapper {
@@ -1569,7 +1729,8 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
 
   .iframe__wrapper--offline,
   .iframe__wrapper--loading {
-    border: 1px dashed black;
+    border: 1px dashed #E4E7EB;
+    border-radius: 10px;
     position: relative;
   }
 
@@ -1579,10 +1740,10 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
+    color: #667085;
     /* body-large */
     line-height: 24px;
     font-size: 16px;
-    letter-spacing: 0.5px;
     font-weight: 400;
   }
 
@@ -1605,6 +1766,8 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
     margin-right: 16px;
     margin-top: 16px;
     text-align: right;
+    color: #667085;
+    font-size: 12px;
   }
 
   .template.citations {
@@ -1615,7 +1778,7 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
     list-style: none;
     cursor: pointer;
     user-select: none;
-    color: #0f1d24;
+    color: #667085;
     /* label-large */
     line-height: 20px;
     font-size: 14px;
@@ -1646,10 +1809,10 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
 
   .template.citations__item {
     margin-top: 16px;
-    /* body-large */
-    line-height: 24px;
-    font-size: 16px;
-    letter-spacing: 0.5;
+    color: #667085;
+    /* body-medium */
+    line-height: 1.5;
+    font-size: 13px;
     font-weight: 400;
   }
 </style>

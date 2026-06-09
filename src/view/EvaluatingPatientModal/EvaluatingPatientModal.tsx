@@ -2,7 +2,7 @@ import React, { useCallback } from 'react';
 import { View, StyleSheet, Text, TouchableWithoutFeedback } from 'react-native';
 import type { RootNavigationProps } from '@/view/Router';
 import { theme } from '@/view/theme';
-import { TextButton } from '@/view/components';
+import { Button, TextButton } from '@/view/components';
 
 function EvaluatingPatientModal({
   route,
@@ -48,8 +48,13 @@ function EvaluatingPatientModal({
           a patient.
         </Text>
         <View style={styles.buttonGroup}>
-          <TextButton title="No" onPress={handleDismiss} />
-          <TextButton title="Yes" onPress={handlePressYes} />
+          <TextButton
+            title="No"
+            onPress={handleDismiss}
+            textColor={theme.colors.ink2}
+            style={styles.btnSecondary}
+          />
+          <Button title="Yes" onPress={handlePressYes} />
         </View>
       </View>
     </View>
@@ -62,10 +67,11 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    padding: theme.spaces.md,
   },
   background: {
-    backgroundColor: 'black',
-    opacity: 0.25,
+    backgroundColor: theme.colors.ink,
+    opacity: 0.5,
     position: 'absolute',
     top: 0,
     bottom: 0,
@@ -73,27 +79,33 @@ const styles = StyleSheet.create({
     right: 0,
   },
   contentContainer: {
-    backgroundColor: theme.colors.surfaceContainerHigh,
-    ...theme.elevations[3],
+    backgroundColor: theme.colors.surface,
+    ...theme.elevations.lg,
     padding: theme.spaces.lg,
+    width: '100%',
     minWidth: 280,
-    maxWidth: 560,
-    borderRadius: 28,
+    maxWidth: 480,
+    borderRadius: theme.radii.lg,
   },
   buttonGroup: {
     marginTop: theme.spaces.lg,
     display: 'flex',
     flexDirection: 'row',
+    alignItems: 'center',
     alignSelf: 'flex-end',
+    gap: theme.spaces.sm,
+  },
+  btnSecondary: {
+    alignSelf: 'center',
   },
   title: {
-    ...theme.fonts.headlineSmall,
-    color: theme.colors.onSurface,
+    ...theme.fonts.titleLarge,
+    color: theme.colors.ink,
   },
   subtitle: {
     ...theme.fonts.bodyMedium,
-    color: theme.colors.onSurfaceVariant,
-    marginTop: theme.spaces.md,
+    color: theme.colors.ink2,
+    marginTop: theme.spaces.sm,
   },
 });
 

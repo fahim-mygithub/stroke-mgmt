@@ -24,9 +24,7 @@ function factory(
   getAllTagsAction: GetAllTagsAction
 ) {
   return function HomeScreen({ navigation }: AppNavigationProps<'HomeScreen'>) {
-    const { width, height: windowHeight } = useWindowDimensions();
-    const innerWidth =
-      Math.min(width, theme.breakpoints.width.tablet) - 2 * theme.spaces.md;
+    const { height: windowHeight } = useWindowDimensions();
 
     const handleSelectArticle = useCallback(
       (id: ArticleId) => {
@@ -68,6 +66,7 @@ function factory(
             )}
             onSelectAlgorithm={handleSelectAlgorithm}
           />
+          <View style={styles.separator} />
           <ArticleList
             getAllArticles={useCallback(
               (cb: (as: Article[]) => void) => getAllArticlesAction.execute(cb),
@@ -76,7 +75,6 @@ function factory(
             getAllTags={useCallback((cb) => getAllTagsAction.execute(cb), [])}
             onSelectArticle={handleSelectArticle}
             style={styles.articleList}
-            listWidth={innerWidth}
             maxItemsPerPage={
               windowHeight > theme.breakpoints.height.tablet ? 9 : 5
             }
@@ -102,7 +100,12 @@ const styles = StyleSheet.create({
     paddingRight: theme.spaces.md,
   },
   articleList: {
-    marginTop: theme.spaces.md,
+    marginTop: theme.spaces.lg,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: theme.colors.border2,
+    marginTop: theme.spaces.xl,
   },
 });
 

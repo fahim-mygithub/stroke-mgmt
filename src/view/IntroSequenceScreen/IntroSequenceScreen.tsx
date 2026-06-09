@@ -15,6 +15,12 @@ import { IntroSequenceBottomBar } from '@/view/IntroSequenceScreen/IntroSequence
 import { useShouldShow } from '@/view/IntroSequenceScreen/useShouldShow';
 import { useHasSeenDisclaimer } from '@/view/lib/useHasSeenDisclaimer';
 import type { ArticleId } from '@/domain/models/Article';
+import {
+  isFirstIndex,
+  isLastIndex,
+  nextIndex,
+  prevIndex,
+} from '@/view/IntroSequenceScreen/slideIndex';
 
 function factory(
   getIntroSequenceAction: GetIntroSequenceAction,
@@ -24,10 +30,7 @@ function factory(
     navigation,
     route,
   }: AppNavigationProps<'IntroSequenceScreen'>) {
-    useSetAndroidBottomNavigationBarColor(
-      theme.colors.secondaryContainer,
-      'dark'
-    );
+    useSetAndroidBottomNavigationBarColor(theme.colors.surface, 'dark');
 
     const openDisclaimer = useCallback(() => {
       navigation.navigate('DisclaimerModal');
@@ -49,16 +52,19 @@ function factory(
       queryKey: ['intro-sequence'],
       queryFn: () => getIntroSequenceAction.execute(onIntroStale),
     });
-    const isLastArticle =
-      !query.isLoading &&
-      !!query.data &&
-      sequenceCursor + 1 === query.data.getArticleIds().length;
+
+    const slideCount =
+      !query.isLoading && query.data ? query.data.getArticleIds().length : 0;
+    const isLastArticle = !query.isLoading && !!query.data && isLastIndex(
+      sequenceCursor,
+      slideCount
+    );
 
     const [checkboxValue, setCheckboxValue, saveShouldShow] = useShouldShow();
 
     const [seenEvalPtModal, setSeenEvalPtModal] = useState(false);
 
-    const handlePressButton = useCallback(() => {
+    const handlePressNext = useCallback(() => {
       if (query.isError) {
         navigation.reset({ index: 0, routes: [{ name: 'HomeScreen' }] });
         return;
@@ -72,10 +78,10 @@ function factory(
         navigation.navigate('EvaluatingPatientModal', { suggestedAlgorithmId });
         return;
       }
-      const { length } = query.data.getArticleIds();
-      if (sequenceCursor !== length - 1) {
+      const count = query.data.getArticleIds().length;
+      if (!isLastIndex(sequenceCursor, count)) {
         // not done with sequence
-        setSequenceCursor(sequenceCursor + 1);
+        setSequenceCursor(nextIndex(sequenceCursor, count));
       } else {
         // done with sequence
         saveShouldShow();
@@ -91,6 +97,12 @@ function factory(
       sequenceCursor,
       setSequenceCursor,
     ]);
+
+    const handlePressPrevious = useCallback(() => {
+      if (query.isLoading || !query.data) return;
+      const count = query.data.getArticleIds().length;
+      setSequenceCursor(prevIndex(sequenceCursor, count));
+    }, [query.data, query.isLoading, sequenceCursor, setSequenceCursor]);
 
     const handlePressExternalLink = useCallback(
       (url: string) => navigation.navigate('ExternalLinkModal', { url }),
@@ -128,18 +140,24 @@ function factory(
 
     return (
       <View style={styles.container}>
-        <UseQueryResultView
-          query={query}
-          renderData={renderData}
-          renderError={renderError}
-          renderLoading={renderLoading}
-        />
+        <View style={styles.slideArea}>
+          <UseQueryResultView
+            query={query}
+            renderData={renderData}
+            renderError={renderError}
+            renderLoading={renderLoading}
+          />
+        </View>
         <IntroSequenceBottomBar
-          onPressButton={handlePressButton}
+          onPressNext={handlePressNext}
+          onPressPrevious={handlePressPrevious}
           onChangeCheckbox={setCheckboxValue}
           checkboxValue={checkboxValue}
-          checkboxVisible={isLastArticle}
-          buttonTitle={query.isError ? 'Go Home' : 'Proceed'}
+          isFirst={isFirstIndex(sequenceCursor)}
+          isLast={isLastArticle}
+          nextTitle={
+            query.isError ? 'Go Home' : isLastArticle ? 'Get Started' : 'Next'
+          }
         />
       </View>
     );
@@ -147,7 +165,8 @@ function factory(
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
+  container: { flex: 1, backgroundColor: theme.colors.surface },
+  slideArea: { flex: 1 },
 });
 
 factory.$inject = ['getIntroSequenceAction', 'renderArticleByIdAction'];

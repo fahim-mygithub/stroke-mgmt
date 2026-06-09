@@ -16,15 +16,15 @@ type Props = {
 function DisclaimerView({ html, onPressExternalLink }: Props) {
   const { width, height } = useWindowDimensions();
   // minus padding of modal
-  const maxWebviewWidth = 560 - theme.spaces.lg * 2;
+  const maxWebviewWidth = 480 - theme.spaces.lg * 2;
   // minus margin of screen and padding of modal
   const screenWidthMinusSpace =
     width - theme.spaces.md * 2 - theme.spaces.lg * 2;
 
   const webViewWidth = Math.min(screenWidthMinusSpace, maxWebviewWidth);
   const [webViewInnerHeight, setWebViewInnerHeight] = useState(1);
-  // minus button, button margin and padding of modal
-  const maxWebviewHeight = Math.min(height, 560) - theme.spaces.lg * 3 - 40;
+  // minus button (44), button margin and padding of modal
+  const maxWebviewHeight = Math.min(height, 560) - theme.spaces.lg * 3 - 44;
   const webViewHeight = Math.min(webViewInnerHeight, maxWebviewHeight);
 
   const eventHandler = useMemo(
@@ -52,7 +52,7 @@ function DisclaimerView({ html, onPressExternalLink }: Props) {
         html={html}
         style={{
           width: webViewWidth,
-          backgroundColor: theme.colors.background,
+          backgroundColor: theme.colors.surface,
         }}
         onMessage={handleMessage}
         scrollEnabled={webViewInnerHeight > maxWebviewHeight}

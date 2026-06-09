@@ -2,12 +2,16 @@ import React, { useCallback, useContext } from 'react';
 import { StyleSheet, View, Text } from 'react-native';
 import type { StackHeaderProps } from '@react-navigation/stack';
 import type { Route } from '@react-navigation/native';
+import { useQuery } from '@tanstack/react-query';
 import { NoInternetBanner, useNoInternetBanner } from '@/view/NoInternetBanner';
 import { theme } from '@/view/theme';
 import { StatusBar } from '@/view/StatusBar';
-import { IconButton, TextButton } from '@/view/components';
+import { TextButton } from '@/view/components';
 import { HeaderScrollContext } from '@/view/Router/HeaderScrollContext';
 import { hideIntroSequence } from '@/view/lib/shouldShowIntroSequence';
+import type { IntroSequence } from '@/domain/models/IntroSequence';
+import { IntroProgressDots } from '@/view/IntroSequenceScreen/IntroProgressDots';
+import { clampIndex } from '@/view/IntroSequenceScreen/slideIndex';
 
 type IntroSequenceParams = {
   cursor: number;
@@ -26,26 +30,16 @@ function IntroSequenceHeader({ route, navigation }: StackHeaderProps) {
     throw Error('No Intro Sequence cursor provided to header');
 
   const sequenceCursor = (route as IntroSequenceRoute).params.cursor;
-  const setSequenceCursor = useCallback(
-    (cursor: number) => navigation.setParams({ cursor }),
-    [navigation]
-  );
 
-  // initial start = no, hasBack is true once nav to modal...
-  const { index, routes } = navigation.getState();
-  const prevRouteName: string | undefined = routes?.[index - 1]?.name;
-  const shouldShowBack = prevRouteName === 'HomeScreen' || sequenceCursor !== 0;
-
-  const handlePressBack = useCallback(() => {
-    if (sequenceCursor > 0) {
-      setSequenceCursor(sequenceCursor - 1);
-      return;
-    }
-    if (prevRouteName === 'HomeScreen') {
-      // if cursor is at first article and came from home screen
-      navigation.goBack();
-    }
-  }, [navigation, prevRouteName, sequenceCursor, setSequenceCursor]);
+  // Observe the same query the screen populates so the dot count appears (and
+  // re-renders) as soon as the intro sequence loads. `enabled: false` means we
+  // never fetch here — the screen owns the fetch; we just read the shared cache.
+  const { data: sequence } = useQuery<IntroSequence>({
+    queryKey: ['intro-sequence'],
+    enabled: false,
+  });
+  const slideCount = sequence ? sequence.getArticleIds().length : 0;
+  const activeIndex = clampIndex(sequenceCursor, slideCount);
 
   const handlePressSkip = useCallback(() => {
     navigation.reset({ index: 0, routes: [{ name: 'HomeScreen' }] });
@@ -58,17 +52,18 @@ function IntroSequenceHeader({ route, navigation }: StackHeaderProps) {
     >
       <StatusBar textColor="auto" />
       <View style={styles.header}>
-        {shouldShowBack && (
-          <IconButton
-            iconName="arrow-left"
-            onPress={handlePressBack}
-            style={styles.backButton}
-          />
-        )}
-        <Text style={styles.title}>Introduction</Text>
+        <View style={styles.progress}>
+          <IntroProgressDots count={slideCount} activeIndex={activeIndex} />
+          {slideCount > 0 && (
+            <Text style={styles.counter} allowFontScaling={false}>
+              {activeIndex + 1} of {slideCount}
+            </Text>
+          )}
+        </View>
         <TextButton
-          title="Skip Intro"
+          title="Skip"
           onPress={handlePressSkip}
+          textColor={theme.colors.ink3}
           style={styles.skipButton}
         />
       </View>
@@ -86,31 +81,30 @@ const styles = StyleSheet.create({
     backgroundColor: theme.colors.surface,
   },
   containerElevated: {
-    backgroundColor: theme.colors.surfaceContainer,
-    ...theme.elevations[2],
+    ...theme.elevations[1],
+    borderBottomWidth: 1,
+    borderBottomColor: theme.colors.border2,
   },
   header: {
-    height: 56,
-    paddingRight: theme.spaces.md,
+    minHeight: 56,
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingLeft: theme.spaces.md,
+    paddingRight: theme.spaces.xs,
   },
-  title: {
-    ...theme.fonts.titleLarge,
-    color: theme.colors.onSurface,
-    position: 'absolute',
-    left: 56,
-    top: '50%',
-    transform: [{ translateY: -14 }],
+  progress: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
   },
-  backButton: {
-    position: 'absolute',
-    top: theme.spaces.xs,
-    left: theme.spaces.xs,
+  counter: {
+    ...theme.fonts.labelLarge,
+    fontSize: 12,
+    color: theme.colors.ink3,
+    marginLeft: theme.spaces.sm,
   },
   skipButton: {
-    position: 'absolute',
-    top: theme.spaces.sm,
-    right: theme.spaces.xs,
-    color: theme.colors.onSurfaceVariant,
+    height: 40,
   },
 });
 

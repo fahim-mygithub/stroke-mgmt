@@ -5,7 +5,7 @@ import type { RootNavigationProps } from '@/view/Router';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { DisclaimerView } from '@/view/DisclaimerModal/DisclaimerView';
 import { UseQueryResultView } from '@/view/lib/UseQueryResultView';
-import { LoadingSpinnerView, TextButton } from '@/view/components';
+import { LoadingSpinnerView, Button } from '@/view/components';
 import { theme } from '@/view/theme';
 import { setSeenDisclaimer } from '@/view/lib/useHasSeenDisclaimer';
 import { DisclaimerErrorView } from '@/view/DisclaimerModal/DisclaimerErrorView';
@@ -54,11 +54,9 @@ function factory(renderDisclaimerAction: RenderDisclaimerAction) {
                     html={html}
                     onPressExternalLink={onPressExternalLink}
                   />
-                  <TextButton
-                    title="Got it"
-                    onPress={handleDismiss}
-                    style={styles.btnDismiss}
-                  />
+                  <View style={styles.footer}>
+                    <Button title="Got it" onPress={handleDismiss} />
+                  </View>
                 </>
               ),
               [handleDismiss, onPressExternalLink]
@@ -88,10 +86,11 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    padding: theme.spaces.md,
   },
   background: {
-    backgroundColor: 'black',
-    opacity: 0.25,
+    backgroundColor: theme.colors.ink,
+    opacity: 0.5,
     position: 'absolute',
     top: 0,
     bottom: 0,
@@ -99,22 +98,24 @@ const styles = StyleSheet.create({
     right: 0,
   },
   contentContainer: {
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.surface,
+    ...theme.elevations.lg,
     padding: theme.spaces.lg,
     justifyContent: 'space-between',
     minHeight: 280,
     maxHeight: 560,
     minWidth: 280,
-    maxWidth: 560,
-    borderRadius: 28,
+    maxWidth: 480,
+    borderRadius: theme.radii.lg,
   },
   contentContainerWithError: {
     marginHorizontal: theme.spaces.md,
     padding: 0,
+    overflow: 'hidden',
   },
-  btnDismiss: {
+  footer: {
     marginTop: theme.spaces.lg,
-    alignSelf: 'flex-end',
+    alignItems: 'flex-end',
   },
 });
 
