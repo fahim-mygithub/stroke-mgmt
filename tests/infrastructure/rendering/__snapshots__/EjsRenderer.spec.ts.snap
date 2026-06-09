@@ -1149,6 +1149,7 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
 </li>
   
 </ul>
+
   </main>
   
   <details class="template citations">
@@ -1847,11 +1848,19 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
       <summary><span class="template outcomes__title">Not Stable<span></summary>
       <div class="template outcomes__body">Stabilize ABCTs before continuing!</div>
       
+      
+      
+      
+      <button class="template outcomes__button" data-next-id="__finish__:1">
+        Complete &amp; view summary
+      </button>
+      
     </details>
   </li>
   
   
 </ul>
+
   </main>
   
   <details class="template citations">

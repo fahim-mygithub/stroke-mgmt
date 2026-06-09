@@ -6,6 +6,7 @@ import type { RenderAlgorithmByIdAction } from '@/application/RenderAlgorithmByI
 import type { RenderAlgorithmAction } from '@/application/RenderAlgorithmAction';
 import { AlgorithmCollectionView } from '@/view/AlgorithmViewerScreen/components/AlgorithmCollectionView/AlgorithmCollectionView';
 import type { ArticleId } from '@/domain/models/Article';
+import { useTreatmentTrail, type TreatmentStep } from '@/view/lib/TreatmentTrail';
 
 function factory(
   renderAlgorithmByIdAction: RenderAlgorithmByIdAction,
@@ -37,6 +38,18 @@ function factory(
       [navigation]
     );
 
+    const { recordChoice } = useTreatmentTrail();
+
+    const onRecordStep = useCallback(
+      (step: TreatmentStep) => recordChoice(step),
+      [recordChoice]
+    );
+
+    const onReachSummary = useCallback(
+      () => navigation.navigate('TreatmentSummaryScreen'),
+      [navigation]
+    );
+
     return (
       <View style={styles.container} onLayout={handleLayout}>
         <AlgorithmCollectionView
@@ -53,6 +66,8 @@ function factory(
           minHeight={height}
           onPressArticleLink={onPressArticleLink}
           onPressExternalLink={onPressExternalLink}
+          onRecordStep={onRecordStep}
+          onReachSummary={onReachSummary}
         />
       </View>
     );

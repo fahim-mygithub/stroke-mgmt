@@ -23,6 +23,7 @@ import {
   initialWindowMetrics,
 } from 'react-native-safe-area-context';
 import { ErrorBoundary } from '@/view/error-handling';
+import { TreatmentTrailProvider } from '@/view/lib/TreatmentTrail';
 
 type AppProps = {
   onLayout?: (e: LayoutChangeEvent) => void;
@@ -66,7 +67,9 @@ function factory(Router: Router) {
               <QueryClientProvider client={queryClient}>
                 <HeaderScrollContext.Provider value={headerScrollState}>
                   <SnackbarProvider>
-                    <Router />
+                    <TreatmentTrailProvider>
+                      <Router />
+                    </TreatmentTrailProvider>
                   </SnackbarProvider>
                 </HeaderScrollContext.Provider>
               </QueryClientProvider>

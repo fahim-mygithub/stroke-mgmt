@@ -12,6 +12,7 @@ import { useAlgorithmCollection } from '@/view/AlgorithmViewerScreen/components/
 import type { AlgorithmIdWithUuid } from '@/view/AlgorithmViewerScreen/components/AlgorithmCollectionView/AlgorithmCollection';
 import { useScrollBehavior } from '@/view/AlgorithmViewerScreen/components/AlgorithmCollectionView/useScrollBehavior';
 import type { ArticleId } from '@/domain/models/Article';
+import type { TreatmentStep } from '@/view/lib/TreatmentTrail';
 
 type Props = {
   width: number;
@@ -23,6 +24,8 @@ type Props = {
   ) => Promise<RenderedAlgorithm>;
   onPressArticleLink: (id: ArticleId) => void;
   onPressExternalLink: (url: string) => void;
+  onRecordStep: (step: TreatmentStep) => void;
+  onReachSummary: () => void;
   initialId: AlgorithmId;
 };
 
@@ -33,6 +36,8 @@ function BaseAlgorithmCollectionView({
   renderAlgorithm,
   onPressArticleLink,
   onPressExternalLink,
+  onRecordStep,
+  onReachSummary,
   initialId,
 }: Props) {
   const { scrollToEnd, flatList, handleScroll } = useScrollBehavior();
@@ -62,6 +67,8 @@ function BaseAlgorithmCollectionView({
         dropItemsFromCollectionAfter={handleDropItemsFromCollectionAfter}
         onPressArticleLink={onPressArticleLink}
         onPressExternalLink={onPressExternalLink}
+        onRecordStep={onRecordStep}
+        onReachSummary={onReachSummary}
         onFirstLayout={index !== 0 ? scrollToEnd : noop}
       />
     ),
@@ -75,6 +82,8 @@ function BaseAlgorithmCollectionView({
       handleDropItemsFromCollectionAfter,
       onPressArticleLink,
       onPressExternalLink,
+      onRecordStep,
+      onReachSummary,
       scrollToEnd,
       noop,
     ]
