@@ -50,6 +50,6 @@ module.exports = {
     runtimeVersion: {
       policy: 'appVersion',
     },
-    plugins: ['expo-asset', 'expo-sqlite', 'expo-font'],
+    plugins: ['expo-asset', 'expo-sqlite', 'expo-font', 'expo-sharing'],
   },
 };

@@ -1,40 +1,98 @@
+// Inter type system from the redesign mockup. In React Native a custom font's
+// weight is encoded in the family name (Inter_600SemiBold), so each scale entry
+// carries an explicit `fontFamily`; `fontWeight` is kept for fallback before the
+// font finishes loading. Existing scale names are preserved (and remapped to the
+// mockup sizes); new redesign names are added below.
+
+export const fontFamily = {
+  regular: 'Inter_400Regular',
+  medium: 'Inter_500Medium',
+  semibold: 'Inter_600SemiBold',
+  bold: 'Inter_700Bold',
+} as const;
+
 export const fonts = {
+  // --- existing scale names (remapped to mockup sizing) ---
   headlineLarge: {
+    fontFamily: fontFamily.bold,
+    fontWeight: '700',
+    fontSize: 34,
     lineHeight: 40,
-    fontSize: 32,
-    fontWeight: '400',
+    letterSpacing: -0.5,
   },
   headlineSmall: {
-    lineHeight: 32,
+    fontFamily: fontFamily.bold,
+    fontWeight: '700',
     fontSize: 24,
-    fontWeight: '400',
+    lineHeight: 30,
   },
   titleLarge: {
-    lineHeight: 28,
+    fontFamily: fontFamily.bold,
+    fontWeight: '700',
     fontSize: 22,
+    lineHeight: 28,
     letterSpacing: 0,
-    fontWeight: '400',
   },
   titleMedium: {
-    lineHeight: 24,
+    fontFamily: fontFamily.semibold,
+    fontWeight: '600',
     fontSize: 16,
-    letterSpacing: 0.15,
-    fontWeight: '500',
+    lineHeight: 24,
+    letterSpacing: 0,
   },
   labelLarge: {
-    lineHeight: 20,
-    fontSize: 14,
+    fontFamily: fontFamily.medium,
     fontWeight: '500',
+    fontSize: 14,
+    lineHeight: 20,
   },
   bodyLarge: {
-    lineHeight: 24,
-    fontSize: 16,
+    fontFamily: fontFamily.regular,
     fontWeight: '400',
+    fontSize: 16,
+    lineHeight: 24,
   },
   bodyMedium: {
-    lineHeight: 20,
-    fontSize: 14,
-    letterSpacing: 0.25,
+    fontFamily: fontFamily.regular,
     fontWeight: '400',
+    fontSize: 15,
+    lineHeight: 22,
+    letterSpacing: 0,
+  },
+
+  // --- redesign scale (mockup) ---
+  eyebrow: {
+    fontFamily: fontFamily.semibold,
+    fontWeight: '600',
+    fontSize: 11,
+    lineHeight: 16,
+    letterSpacing: 0.9,
+  },
+  cardTitle: {
+    fontFamily: fontFamily.semibold,
+    fontWeight: '600',
+    fontSize: 17,
+    lineHeight: 22,
+  },
+  sectionTitle: {
+    fontFamily: fontFamily.bold,
+    fontWeight: '700',
+    fontSize: 22,
+    lineHeight: 28,
+    letterSpacing: -0.2,
+  },
+  screenTitle: {
+    fontFamily: fontFamily.bold,
+    fontWeight: '700',
+    fontSize: 28,
+    lineHeight: 34,
+    letterSpacing: -0.4,
+  },
+  articleTitle: {
+    fontFamily: fontFamily.bold,
+    fontWeight: '700',
+    fontSize: 34,
+    lineHeight: 39,
+    letterSpacing: -0.6,
   },
 } as const;

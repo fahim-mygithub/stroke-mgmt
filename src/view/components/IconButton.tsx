@@ -10,6 +10,9 @@ type IconButtonProps = {
   style?: StyleProp<ViewStyle>;
   iconStyle?: StyleProp<ViewStyle | TextStyle>;
   disabled?: boolean;
+  // 'bare' keeps the original 48px touch target (default, used app-wide);
+  // 'boxed' is the redesign's 36px bordered square (top-bar search/kebab).
+  variant?: 'bare' | 'boxed';
 };
 
 function IconButton({
@@ -18,16 +21,20 @@ function IconButton({
   style = {},
   iconStyle = {},
   disabled = false,
+  variant = 'bare',
 }: IconButtonProps) {
   return (
     <TouchableOpacity
       onPress={onPress}
-      style={[styles.iconButton, style]}
+      style={[
+        variant === 'boxed' ? styles.boxed : styles.iconButton,
+        style,
+      ]}
       disabled={disabled}
     >
       <FontAwesome5
         name={iconName}
-        size={24}
+        size={variant === 'boxed' ? 16 : 24}
         style={[styles.icon, disabled && styles.disabled, iconStyle]}
       />
     </TouchableOpacity>
@@ -41,6 +48,16 @@ const styles = StyleSheet.create({
   iconButton: {
     height: 48,
     width: 48,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  boxed: {
+    height: 36,
+    width: 36,
+    borderRadius: theme.radii.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
+    backgroundColor: theme.colors.surface,
     justifyContent: 'center',
     alignItems: 'center',
   },
