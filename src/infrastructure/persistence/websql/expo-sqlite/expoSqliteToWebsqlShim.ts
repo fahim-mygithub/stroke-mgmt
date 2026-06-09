@@ -87,6 +87,12 @@ function makeTransaction(
 }
 
 function wrapSQLiteDatabase(sqliteDb: SQLiteDatabase): Database {
+  // expo-sqlite v56 no longer serializes concurrent withTransactionAsync calls
+  // on a single connection, so overlapping WebSQL transactions raced into
+  // "cannot start a transaction within a transaction". WebSQL guarantees
+  // serial transactions per database, so chain everything onto one queue.
+  let serialQueue: Promise<void> = Promise.resolve();
+
   const runTx = (
     readOnly: boolean,
     txCallback: SQLTransactionCallback,
@@ -111,7 +117,9 @@ function wrapSQLiteDatabase(sqliteDb: SQLiteDatabase): Database {
       }
     };
     // Fire and forget — WebSQL's transaction API is not awaitable.
-    void run();
+    // `run` never rejects (errors are routed to errorCallback above),
+    // so the chain cannot break.
+    serialQueue = serialQueue.then(run);
   };
 
   const db: Database = {

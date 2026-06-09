@@ -14,7 +14,10 @@ async function retry<T>(
 ): Promise<T> {
   try {
     return await call();
-  } catch {
+  } catch (e) {
+    // maxTries previously went unchecked, recursing forever while netinfo
+    // reported isInternetReachable: null — every caller hung on the promise.
+    if (maxTries <= 1) throw e;
     await wait(intervalMs);
     return retry(call, intervalMs, maxTries - 1);
   }
@@ -35,7 +38,10 @@ class ReactNativeNetInfo implements NetworkInfo {
       if (!(e instanceof ReactNativeNetInfoInternetReachabilityUnknownError))
         throw e;
     }
-    return false;
+    // Reachability still unknown after retrying: assume the connection state
+    // tells the truth rather than silently treating "unknown" as offline.
+    const { isConnected } = await NetInfo.fetch();
+    return isConnected ?? false;
   }
 }
 

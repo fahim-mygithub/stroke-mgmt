@@ -11,9 +11,6 @@ module.exports = {
       resizeMode: 'contain',
       backgroundColor: '#000000',
     },
-    updates: {
-      fallbackToCacheTimeout: 0,
-    },
     assetBundlePatterns: ['**/*'],
     ios: {
       supportsTablet: true,
@@ -47,6 +44,7 @@ module.exports = {
       NODE_ENV: process.env.NODE_ENV,
     },
     updates: {
+      fallbackToCacheTimeout: 0,
       url: 'https://u.expo.dev/935f864e-12bb-456a-8214-8070b8ba5baa',
     },
     runtimeVersion: {
