@@ -14,6 +14,7 @@ import { LoadingSpinnerView } from '@/view/components';
 import type { ArticleId } from '@/domain/models/Article';
 import { ScreenErrorView } from '@/view/error-handling';
 import type { TreatmentStep } from '@/view/lib/TreatmentTrail';
+import { decodeHtmlEntities } from '@/view/lib/decodeHtmlEntities';
 
 // Sentinel id emitted by a terminal outcome's "Complete & view summary" button
 // (see outcomeList.ejs). Encodes the chosen displayed-outcome index.
@@ -59,9 +60,9 @@ function recordChosenStep(
 
   onRecordStep({
     algorithmId: algorithm.getId().toString(),
-    algorithmTitle: algorithm.getTitle(),
+    algorithmTitle: decodeHtmlEntities(algorithm.getTitle()),
     outcomeId: isFinish ? nextIdStr : String(chosen?.getNext() ?? nextIdStr),
-    outcomeTitle: chosen?.getTitle() ?? null,
+    outcomeTitle: chosen ? decodeHtmlEntities(chosen.getTitle()) : null,
     score,
   });
 
