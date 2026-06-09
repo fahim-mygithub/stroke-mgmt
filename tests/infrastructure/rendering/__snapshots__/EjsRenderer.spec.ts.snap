@@ -242,17 +242,17 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
   ; // hide iframes in case of no internet connectivity
   (function() {
     function wrapElement(el, className) {
-      var wrapper = document.createElement('div')
+      const wrapper = document.createElement('div')
       wrapper.className = className
-      var newEl = el.cloneNode()
+      const newEl = el.cloneNode()
       wrapper.appendChild(newEl)
       el.replaceWith(wrapper)
       return wrapper
     }
-    var frames = document.getElementsByTagName('iframe')
-    var wrappedFrames = []
-    for (var i = 0; i < frames.length; i++) {
-      var wrappedFrame = wrapElement(frames[i], 'iframe__wrapper iframe__wrapper--loading')
+    const frames = document.getElementsByTagName('iframe')
+    const wrappedFrames = []
+    for (const i = 0; i < frames.length; i++) {
+      const wrappedFrame = wrapElement(frames[i], 'iframe__wrapper iframe__wrapper--loading')
       frames[i].addEventListener('load', function() {
         wrappedFrame.classList.remove('iframe__wrapper--loading')
       })
@@ -263,8 +263,8 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
       return {
         toOnline: function() {},
         toOffline: function() {
-          for (var i = 0; i < wrappedFrames.length; i++) {
-            var wrappedFrame = wrappedFrames[i]
+          for (const i = 0; i < wrappedFrames.length; i++) {
+            const wrappedFrame = wrappedFrames[i]
             wrappedFrame.classList.add('iframe__wrapper--offline')
           }
           context.state = OfflineState(context)
@@ -275,8 +275,8 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
     function OfflineState(context) {
       return {
         toOnline: function() {
-          for (var i = 0; i < wrappedFrames.length; i++) {
-            var wrappedFrame = wrappedFrames[i]
+          for (const i = 0; i < wrappedFrames.length; i++) {
+            const wrappedFrame = wrappedFrames[i]
             wrappedFrame.classList.remove('iframe__wrapper--offline')
           }
           context.state = OnlineState(context)
@@ -286,7 +286,7 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
     }
 
     function ConnectivityStateManager() {
-      var context = {}
+      const context = {}
       context.state = window.navigator.onLine ? OnlineState(context) : OfflineState(context)
 
       window.addEventListener('online', function() {
@@ -298,7 +298,7 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
       return context
     }
 
-    var stateManager = ConnectivityStateManager()
+    const stateManager = ConnectivityStateManager()
   })()
 
   ; // Report errors
@@ -418,10 +418,14 @@ exports[`EjsAlgorithmRenderer Behavior should render disclaimer html 1`] = `
 
     ; // Send window size upon load of the window
     (function() {
-      window.addEventListener('load', () => notifyLayout({
-        width: document.body.offsetWidth,
-        height: document.body.offsetHeight,
-      }));
+      function notify() {
+        notifyLayout({
+          width: document.body.offsetWidth,
+          height: document.body.offsetHeight,
+        })
+      }
+      window.addEventListener('load', notify);
+      window.addEventListener('resize', notify);
     })();
 
     ; // Listen to click of any link
@@ -441,17 +445,17 @@ exports[`EjsAlgorithmRenderer Behavior should render disclaimer html 1`] = `
     ; // hide iframes in case of no internet connectivity
     (function() {
       function wrapElement(el, className) {
-        var wrapper = document.createElement('div')
+        const wrapper = document.createElement('div')
         wrapper.className = className
-        var newEl = el.cloneNode()
+        const newEl = el.cloneNode()
         wrapper.appendChild(newEl)
         el.replaceWith(wrapper)
         return wrapper
       }
-      var frames = document.getElementsByTagName('iframe')
-      var wrappedFrames = []
-      for (var i = 0; i < frames.length; i++) {
-        var wrappedFrame = wrapElement(frames[i], 'iframe__wrapper iframe__wrapper--loading')
+      const frames = document.getElementsByTagName('iframe')
+      const wrappedFrames = []
+      for (const i = 0; i < frames.length; i++) {
+        const wrappedFrame = wrapElement(frames[i], 'iframe__wrapper iframe__wrapper--loading')
         frames[i].addEventListener('load', function() {
           wrappedFrame.classList.remove('iframe__wrapper--loading')
         })
@@ -462,8 +466,8 @@ exports[`EjsAlgorithmRenderer Behavior should render disclaimer html 1`] = `
         return {
           toOnline: function() {},
           toOffline: function() {
-            for (var i = 0; i < wrappedFrames.length; i++) {
-              var wrappedFrame = wrappedFrames[i]
+            for (const i = 0; i < wrappedFrames.length; i++) {
+              const wrappedFrame = wrappedFrames[i]
               wrappedFrame.classList.add('iframe__wrapper--offline')
             }
             context.state = OfflineState(context)
@@ -474,8 +478,8 @@ exports[`EjsAlgorithmRenderer Behavior should render disclaimer html 1`] = `
       function OfflineState(context) {
         return {
           toOnline: function() {
-            for (var i = 0; i < wrappedFrames.length; i++) {
-              var wrappedFrame = wrappedFrames[i]
+            for (const i = 0; i < wrappedFrames.length; i++) {
+              const wrappedFrame = wrappedFrames[i]
               wrappedFrame.classList.remove('iframe__wrapper--offline')
             }
             context.state = OnlineState(context)
@@ -485,7 +489,7 @@ exports[`EjsAlgorithmRenderer Behavior should render disclaimer html 1`] = `
       }
 
       function ConnectivityStateManager() {
-        var context = {}
+        const context = {}
         context.state = window.navigator.onLine ? OnlineState(context) : OfflineState(context)
 
         window.addEventListener('online', function() {
@@ -497,7 +501,7 @@ exports[`EjsAlgorithmRenderer Behavior should render disclaimer html 1`] = `
         return context
       }
 
-      var stateManager = ConnectivityStateManager()
+      const stateManager = ConnectivityStateManager()
     })()
 
     ; // Report errors
@@ -1081,6 +1085,9 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
       subtree: true
     })
 
+    // In case of window resizing
+    window.addEventListener('resize', notify)
+
     // Wait for any images to finish loading
     window.addEventListener('load', notify)
     notify()
@@ -1189,17 +1196,17 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
   ; // hide iframes in case of no internet connectivity
   (function() {
     function wrapElement(el, className) {
-      var wrapper = document.createElement('div')
+      const wrapper = document.createElement('div')
       wrapper.className = className
-      var newEl = el.cloneNode()
+      const newEl = el.cloneNode()
       wrapper.appendChild(newEl)
       el.replaceWith(wrapper)
       return wrapper
     }
-    var frames = document.getElementsByTagName('iframe')
-    var wrappedFrames = []
-    for (var i = 0; i < frames.length; i++) {
-      var wrappedFrame = wrapElement(frames[i], 'iframe__wrapper iframe__wrapper--loading')
+    const frames = document.getElementsByTagName('iframe')
+    const wrappedFrames = []
+    for (const i = 0; i < frames.length; i++) {
+      const wrappedFrame = wrapElement(frames[i], 'iframe__wrapper iframe__wrapper--loading')
       frames[i].addEventListener('load', function() {
         wrappedFrame.classList.remove('iframe__wrapper--loading')
       })
@@ -1210,8 +1217,8 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
       return {
         toOnline: function() {},
         toOffline: function() {
-          for (var i = 0; i < wrappedFrames.length; i++) {
-            var wrappedFrame = wrappedFrames[i]
+          for (const i = 0; i < wrappedFrames.length; i++) {
+            const wrappedFrame = wrappedFrames[i]
             wrappedFrame.classList.add('iframe__wrapper--offline')
           }
           context.state = OfflineState(context)
@@ -1222,8 +1229,8 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
     function OfflineState(context) {
       return {
         toOnline: function() {
-          for (var i = 0; i < wrappedFrames.length; i++) {
-            var wrappedFrame = wrappedFrames[i]
+          for (const i = 0; i < wrappedFrames.length; i++) {
+            const wrappedFrame = wrappedFrames[i]
             wrappedFrame.classList.remove('iframe__wrapper--offline')
           }
           context.state = OnlineState(context)
@@ -1233,7 +1240,7 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
     }
 
     function ConnectivityStateManager() {
-      var context = {}
+      const context = {}
       context.state = window.navigator.onLine ? OnlineState(context) : OfflineState(context)
 
       window.addEventListener('online', function() {
@@ -1245,7 +1252,7 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
       return context
     }
 
-    var stateManager = ConnectivityStateManager()
+    const stateManager = ConnectivityStateManager()
   })()
 </script>
 </body>
@@ -1738,6 +1745,9 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
       subtree: true
     })
 
+    // In case of window resizing
+    window.addEventListener('resize', notify)
+
     // Wait for any images to finish loading
     window.addEventListener('load', notify)
     notify()
@@ -1846,17 +1856,17 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
   ; // hide iframes in case of no internet connectivity
   (function() {
     function wrapElement(el, className) {
-      var wrapper = document.createElement('div')
+      const wrapper = document.createElement('div')
       wrapper.className = className
-      var newEl = el.cloneNode()
+      const newEl = el.cloneNode()
       wrapper.appendChild(newEl)
       el.replaceWith(wrapper)
       return wrapper
     }
-    var frames = document.getElementsByTagName('iframe')
-    var wrappedFrames = []
-    for (var i = 0; i < frames.length; i++) {
-      var wrappedFrame = wrapElement(frames[i], 'iframe__wrapper iframe__wrapper--loading')
+    const frames = document.getElementsByTagName('iframe')
+    const wrappedFrames = []
+    for (const i = 0; i < frames.length; i++) {
+      const wrappedFrame = wrapElement(frames[i], 'iframe__wrapper iframe__wrapper--loading')
       frames[i].addEventListener('load', function() {
         wrappedFrame.classList.remove('iframe__wrapper--loading')
       })
@@ -1867,8 +1877,8 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
       return {
         toOnline: function() {},
         toOffline: function() {
-          for (var i = 0; i < wrappedFrames.length; i++) {
-            var wrappedFrame = wrappedFrames[i]
+          for (const i = 0; i < wrappedFrames.length; i++) {
+            const wrappedFrame = wrappedFrames[i]
             wrappedFrame.classList.add('iframe__wrapper--offline')
           }
           context.state = OfflineState(context)
@@ -1879,8 +1889,8 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
     function OfflineState(context) {
       return {
         toOnline: function() {
-          for (var i = 0; i < wrappedFrames.length; i++) {
-            var wrappedFrame = wrappedFrames[i]
+          for (const i = 0; i < wrappedFrames.length; i++) {
+            const wrappedFrame = wrappedFrames[i]
             wrappedFrame.classList.remove('iframe__wrapper--offline')
           }
           context.state = OnlineState(context)
@@ -1890,7 +1900,7 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
     }
 
     function ConnectivityStateManager() {
-      var context = {}
+      const context = {}
       context.state = window.navigator.onLine ? OnlineState(context) : OfflineState(context)
 
       window.addEventListener('online', function() {
@@ -1902,7 +1912,7 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
       return context
     }
 
-    var stateManager = ConnectivityStateManager()
+    const stateManager = ConnectivityStateManager()
   })()
 </script>
 </body>

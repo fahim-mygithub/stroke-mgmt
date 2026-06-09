@@ -4,6 +4,48 @@ Running notes on annual Expo SDK upgrade cycles. Add a new section per year; kee
 
 ---
 
+## 2026 — SDK 55 → 56 (Fahim)
+
+Mid-cycle bump, done so the app can be tested on physical phones with free Expo Go: the App Store build of Expo Go only supports SDK 54 and the SDK 55 build is stuck in Apple review, but Expo Go for SDK 56 is available through a free TestFlight External Beta (https://testflight.apple.com/join/GZJxxfUU). Android Expo Go for any SDK installs from https://expo.dev/go.
+
+### What broke and why
+
+| Symptom | Root cause | Fix |
+| --- | --- | --- |
+| `Cannot find module '@expo/vector-icons'` | SDK 56: `expo` no longer depends on `@expo/vector-icons` | Added it as a direct dependency (`npx expo install @expo/vector-icons`). It's deprecated in favor of `@react-native-vector-icons/*`; consider the codemod next cycle |
+| `NavigationBar.setBackgroundColorAsync` / `setButtonStyleAsync` don't exist | Edge-to-edge is mandatory in SDK 56; the Android nav bar is always transparent and only button contrast is settable | `useSetAndroidBottomNavigationBarColor` keeps its signature but ignores the color and calls `NavigationBar.setStyle`. Careful: semantics are inverted — old API took *button* color, new API takes *bar* style (`'light'` bar = dark buttons) |
+| `expo-status-bar` `backgroundColor` prop type error | Same edge-to-edge change removed `backgroundColor`, `translucent`, `networkActivityIndicatorVisible` from `StatusBarProps` | `src/view/StatusBar/StatusBar.tsx` stops forwarding them; its wrapping `View` already emulates the background color |
+| `tsc` can't find `describe`/`jest` globals | TypeScript 6.0 (required by SDK 56) no longer auto-includes `@types/*` globals | `"types": ["jest", "node", "websql"]` in `tsconfig.json`. NO comments in that file — `jest.config.js` `require()`s it as strict JSON |
+| Every Jest suite fails with TS5107/TS5011 | TS 6 turned `moduleResolution: node` (node10) into an error-level deprecation and demands an explicit `rootDir` | `tsconfig.test.json`: added `"ignoreDeprecations": "6.0"` and `"rootDir": "."`. Revisit before TS 7 — node10 resolution gets removed entirely |
+| Jest preset error: "React Native Jest preset has moved" | jest-expo 56 has a new peer dependency | `yarn add --dev @react-native/jest-preset@^0.85.0` |
+
+Also regenerated the 4 stale EjsRenderer snapshots (`var` → `const`) that were left over from last cycle.
+
+### Version jumps this cycle
+
+- expo: ^55.0.15 → ^56.0.0 (all `expo-*` packages to ~56.0.x)
+- react / react-dom: 19.2.0 → 19.2.3
+- react-native: 0.83.4 → 0.85.3 (Hermes v1 is now the default engine)
+- typescript: ~5.9.2 → ~6.0.3
+- @react-native-community/netinfo: 11.5.2 → 12.0.1
+- new devDep: @react-native/jest-preset ^0.85.0
+
+### Verification
+
+- `npx expo-doctor` — 21/21
+- `npx tsc --noEmit` — clean
+- `npx jest` — 23/27 suites; the remaining 4 fail as worker-child crashes, pre-existing since before the handoff
+- `npx expo export --platform web` — bundles cleanly
+
+### Testing on physical devices (free Expo Go path)
+
+Start the dev server with `yarn dev` (tunnel mode — phone does not need to be on the same network).
+
+- **Android**: install Expo Go from https://expo.dev/go (pick SDK 56) — the Play Store version is stuck on SDK 54. Then scan the QR code from the dev server.
+- **iPhone**: install TestFlight from the App Store, then join the Expo Go SDK 56 beta at https://testflight.apple.com/join/GZJxxfUU. Then scan the QR code with the Camera app.
+
+---
+
 ## 2026 — SDK 54 → 55 (Fahim)
 
 First cycle after handoff from Sam. One-version major bump, plus a repair of the web export (which had never worked in production). No store submission this cycle — store-account access still being sorted.

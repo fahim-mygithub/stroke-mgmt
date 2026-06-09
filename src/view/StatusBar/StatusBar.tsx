@@ -11,7 +11,6 @@ type StatusBarProps = {
   backgroundColor?: string;
   translucent?: boolean;
   hideTransitionAnimation?: StatusBarAnimation;
-  networkActivityIndicatorVisible?: boolean;
 };
 
 function StatusBar({
@@ -21,7 +20,6 @@ function StatusBar({
   backgroundColor = undefined,
   translucent = undefined,
   hideTransitionAnimation = undefined,
-  networkActivityIndicatorVisible = undefined,
 }: StatusBarProps) {
   const { top: statusBarHeight } = useSafeAreaInsets();
 
@@ -33,14 +31,13 @@ function StatusBar({
         backgroundColor: backgroundColor ?? 'transparent',
       }}
     >
+      {/* SDK 56 removed backgroundColor/translucent/networkActivityIndicatorVisible
+          (edge-to-edge is mandatory); the wrapping View emulates the background. */}
       <ExpoStatusBar
         animated={animated}
         style={textColor}
         hidden={hidden}
-        backgroundColor={backgroundColor}
-        translucent={translucent}
         hideTransitionAnimation={hideTransitionAnimation}
-        networkActivityIndicatorVisible={networkActivityIndicatorVisible}
       />
     </View>
   );

@@ -4,6 +4,8 @@
     "lib": ["DOM", "ESNext"],
     "module": "commonjs",
     "moduleResolution": "node",
+    "ignoreDeprecations": "6.0",
+    "rootDir": ".",
     "jsx": "react-native",
     "esModuleInterop": true,
     "resolveJsonModule": true,
