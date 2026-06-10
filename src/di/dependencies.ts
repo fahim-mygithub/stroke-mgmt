@@ -55,6 +55,15 @@ const production = Constants.expoConfig?.extra?.NODE_ENV !== 'development';
 
 const localhost = Platform.OS === 'ios' ? 'localhost' : '10.0.2.2';
 
+const liveCmsUrl = 'https://stroke-mgmt-cms.a2hosted.com';
+
+// Development normally points at a local Strapi, but that only exists if a
+// developer is actually running one. To avoid every CMS fetch failing (which
+// makes the home/algorithm/article screens "error out") when there is no local
+// server, dev falls back to the live CMS by default. Opt back in to the local
+// Strapi by setting EXPO_PUBLIC_USE_LOCAL_CMS=true.
+const useLocalCms = process.env.EXPO_PUBLIC_USE_LOCAL_CMS === 'true';
+
 function forward(key: string) {
   const identity = (i: unknown) => i;
   identity.$inject = [key];
@@ -65,9 +74,7 @@ export const module = {
   // CONFIG
   strapiHostUrl: [
     'value',
-    production
-      ? 'https://stroke-mgmt-cms.a2hosted.com'
-      : `http://${localhost}:1337`,
+    !production && useLocalCms ? `http://${localhost}:1337` : liveCmsUrl,
   ],
   currentVersion: ['value', new Version(1, 1, 1)],
 

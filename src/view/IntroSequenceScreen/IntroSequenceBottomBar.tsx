@@ -1,5 +1,6 @@
 import React from 'react';
-import { SafeAreaView, View, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { Button, Checkbox } from '@/view/components';
 import { theme } from '@/view/theme';
 
@@ -27,7 +28,7 @@ function IntroSequenceBottomBar({
 }: Props) {
   const resolvedNextTitle = nextTitle ?? (isLast ? 'Get Started' : 'Next');
   return (
-    <SafeAreaView style={styles.safeArea}>
+    <SafeAreaView edges={['bottom', 'left', 'right']} style={styles.safeArea}>
       <View style={styles.container}>
         {isLast && (
           <Checkbox
