@@ -1,6 +1,6 @@
 import { theme } from '@/view/theme';
 import React from 'react';
-import { View, TouchableHighlight, Text, StyleSheet } from 'react-native';
+import { TouchableHighlight, Text, StyleSheet } from 'react-native';
 
 type Props = {
   children: string;
@@ -9,29 +9,30 @@ type Props = {
 
 function MenuItem({ children, onPress }: Props) {
   return (
-    <TouchableHighlight onPress={onPress}>
-      <View style={styles.container}>
-        <Text style={styles.label}>{children}</Text>
-      </View>
+    <TouchableHighlight
+      onPress={onPress}
+      style={styles.container}
+      underlayColor={theme.colors.brandSofter}
+      activeOpacity={1}
+    >
+      <Text style={styles.label}>{children}</Text>
     </TouchableHighlight>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    paddingLeft: 12,
-    paddingRight: 12,
-    paddingTop: 8,
-    paddingBottom: 8,
-    height: 48,
+    paddingHorizontal: 12,
+    paddingVertical: 9,
+    borderRadius: theme.radii.sm,
     justifyContent: 'center',
-    alignItems: 'center',
-    minWidth: 112,
-    maxWidth: 280,
   },
   label: {
     ...theme.fonts.labelLarge,
-    color: theme.colors.onSurface,
+    fontFamily: theme.fontFamily.regular,
+    fontWeight: '400',
+    fontSize: 14,
+    color: theme.colors.ink,
   },
 });
 

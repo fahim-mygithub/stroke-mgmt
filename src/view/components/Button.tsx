@@ -44,8 +44,8 @@ function Button({
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: 999,
-    height: 40,
+    borderRadius: theme.radii.md,
+    height: 44,
     paddingLeft: theme.spaces.lg,
     paddingRight: theme.spaces.lg,
   },
@@ -54,8 +54,14 @@ const styles = StyleSheet.create({
     display: 'flex',
     justifyContent: 'center',
     alignItems: 'center',
+    borderRadius: theme.radii.md,
+    borderWidth: 1,
   },
-  title: theme.fonts.labelLarge,
+  title: {
+    ...theme.fonts.labelLarge,
+    fontFamily: theme.fontFamily.semibold,
+    fontWeight: '600',
+  },
 });
 
 export { Button };

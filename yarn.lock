@@ -1330,6 +1330,11 @@
   resolved "https://registry.npmjs.org/@eslint/js/-/js-8.53.0.tgz"
   integrity sha512-Kn7K8dx/5U6+cT1yEhpX1w4PCSg0M+XyRILPgvwcEBjerFWCwQj5sbr3/VmxqV0JGHCBCzyd6LxypEuehypY1w==
 
+"@expo-google-fonts/inter@^0.4.2":
+  version "0.4.2"
+  resolved "https://registry.yarnpkg.com/@expo-google-fonts/inter/-/inter-0.4.2.tgz#2d37ffb1cb16600cff616b6c4c0efee9b6c47c28"
+  integrity sha512-syfiImMaDmq7cFi0of+waE2M4uSCyd16zgyWxdPOY7fN2VBmSLKEzkfbZgeOjJq61kSqPBNNtXjggiQiSD6gMQ==
+
 "@expo/cli@^56.1.14":
   version "56.1.14"
   resolved "https://registry.yarnpkg.com/@expo/cli/-/cli-56.1.14.tgz#f999727e65a6f85e47c5476e865a43deb71aa9ad"
@@ -1400,7 +1405,7 @@
   dependencies:
     node-forge "^1.3.3"
 
-"@expo/config-plugins@~56.0.8":
+"@expo/config-plugins@^56.0.8", "@expo/config-plugins@~56.0.8":
   version "56.0.8"
   resolved "https://registry.yarnpkg.com/@expo/config-plugins/-/config-plugins-56.0.8.tgz#32cc6f1bad16402a5a87c1e53836d6bc41d6e500"
   integrity sha512-phTuyBhgVLfqUHMjQkAfRtbyoY6yTxoKja1awtpVnEkoJDxPJuXx1KX5uvq1eZtt4bJQ08OBJ6P95INqRSHpRg==
@@ -4461,10 +4466,24 @@ expo-navigation-bar@~56.0.3:
   dependencies:
     debug "^4.3.2"
 
+expo-print@~56.0.3:
+  version "56.0.3"
+  resolved "https://registry.yarnpkg.com/expo-print/-/expo-print-56.0.3.tgz#85e7636b5f464976223636116c4841a63c23a881"
+  integrity sha512-ByGKQuvYk/hDjqDGD81lUepSyAyd037XHGL90zZDMLC9vcRyGyaW5iX6QruK39JOZsF90rxV7Eu4syQxhBxSvQ==
+
 expo-server@^56.0.5:
   version "56.0.5"
   resolved "https://registry.yarnpkg.com/expo-server/-/expo-server-56.0.5.tgz#601e9a80d166cb65b35f6a38e7a61dc6de12b91d"
   integrity sha512-SmM2p2g3Jrktpiazcst+OxhjSzOHXKAY4BPURHYHXvApzzoybMmrNF4IEZ8DKZ145BhSe4ydAmlEFCRTsdtgUQ==
+
+expo-sharing@~56.0.16:
+  version "56.0.16"
+  resolved "https://registry.yarnpkg.com/expo-sharing/-/expo-sharing-56.0.16.tgz#ae7ec34ffaf21b4fe3c91fee041259b2e9936119"
+  integrity sha512-tp29hiWunLkjIToDqiiJQo4Nfo//92DAg/pcRWENLlnTXy/qg58uxy1O5K6xVZ7sVZIJqwEDLzDedw3PlDmWmg==
+  dependencies:
+    "@expo/config-plugins" "^56.0.8"
+    "@expo/config-types" "^56.0.5"
+    "@expo/plist" "^0.7.0"
 
 expo-splash-screen@~56.0.10:
   version "56.0.10"

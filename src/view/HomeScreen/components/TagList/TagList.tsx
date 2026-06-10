@@ -37,6 +37,8 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexWrap: 'wrap',
     flexDirection: 'row',
+    marginTop: theme.spaces.md,
+    marginBottom: theme.spaces.xs,
   },
   tag: {
     marginRight: theme.spaces.sm,

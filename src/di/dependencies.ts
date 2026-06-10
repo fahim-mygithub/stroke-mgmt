@@ -15,6 +15,8 @@ import { factory as DisclaimerModal } from '@/view/DisclaimerModal';
 import { factory as Router, menuFactory } from '@/view/Router';
 import { factory as AboutUsScreen } from '@/view/AboutUsScreen';
 import { factory as IntroSequenceScreen } from '@/view/IntroSequenceScreen';
+import { factory as TreatmentSummaryScreen } from '@/view/TreatmentSummaryScreen';
+import { ExpoPrintPdfExporter } from '@/infrastructure/pdf/ExpoPrintPdfExporter';
 import { RenderAlgorithmAction } from '@/application/RenderAlgorithmAction';
 import { GetAllAlgorithmsShownOnHomeScreenAction } from '@/application/GetAllAlgorithmsShownOnHomeScreenAction';
 import { GetAlgorithmByIdAction } from '@/application/GetAlgorithmByIdAction';
@@ -110,6 +112,7 @@ export const module = {
   getImageSrcsInHtml: ['value', cheerioGetImageSrcsInHtml],
   replaceImageSrcsInHtml: ['value', cheerioReplaceImageSrcsInHtml],
   imageStore: ['type', ExpoFileSystemImageStore],
+  pdfExporter: ['type', ExpoPrintPdfExporter],
   // Native (`cachedRepositoryBindings.ts`) → Websql* repos backed by
   // expo-sqlite. Web (`cachedRepositoryBindings.web.ts`) → IndexedDb* repos.
   ...cachedRepositoryBindings,
@@ -129,6 +132,7 @@ export const module = {
   ArticleViewerScreen: ['factory', ArticleViewerScreen],
   AlgorithmViewerScreen: ['factory', AlgorithmViewerScreen],
   IntroSequenceScreen: ['factory', IntroSequenceScreen],
+  TreatmentSummaryScreen: ['factory', TreatmentSummaryScreen],
   Menu: ['factory', menuFactory],
 
   // BUILT-INS

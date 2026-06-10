@@ -94,18 +94,21 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   menu: {
-    borderRadius: 4,
+    minWidth: 200,
+    borderRadius: theme.radii.md,
+    borderWidth: 1,
+    borderColor: theme.colors.border,
     backgroundColor: theme.colors.surface,
     position: 'absolute',
     right: theme.spaces.md,
     zIndex: 2,
-    ...theme.elevations[2],
+    ...theme.elevations.lg,
   },
   menuInvisible: { display: 'none' },
   menuVisible: { display: 'flex' },
   content: {
-    paddingTop: theme.spaces.sm,
-    paddingBottom: theme.spaces.sm,
+    padding: theme.spaces.xs + 2,
+    gap: 1,
   },
 });
 

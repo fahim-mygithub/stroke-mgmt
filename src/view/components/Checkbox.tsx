@@ -18,9 +18,9 @@ function Checkbox({ value, onChange, label = '', style = {} }: Props) {
   return (
     <TouchableOpacity onPress={handlePress} style={[styles.container, style]}>
       {value ? (
-        <FontAwesome5 name="check-square" size={24} />
+        <FontAwesome5 name="check-square" size={24} color={theme.colors.brand} />
       ) : (
-        <FontAwesome5 name="square" size={24} />
+        <FontAwesome5 name="square" size={24} color={theme.colors.ink3} />
       )}
       <Text style={styles.text} allowFontScaling={false}>
         {label}

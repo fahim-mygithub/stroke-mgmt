@@ -2,6 +2,7 @@ import React, { useCallback } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
 import { theme } from '@/view/theme';
+import { Eyebrow } from '@/view/components';
 import type { AlgorithmId, Algorithm } from '@/domain/models/Algorithm';
 import { AlgorithmListFilled } from '@/view/HomeScreen/components/AlgorithmList/AlgorithmListFilled';
 import { AlgorithmListError } from '@/view/HomeScreen/components/AlgorithmList/AlgorithmListError';
@@ -32,7 +33,12 @@ function AlgorithmList({
 
   return (
     <View style={style}>
-      <Text style={styles.title}>Algorithms</Text>
+      <Eyebrow>TREATMENT ALGORITHMS</Eyebrow>
+      <Text style={styles.title}>Build a treatment algorithm</Text>
+      <Text style={styles.subtitle}>
+        Start with an assessment pathway. The app walks you through each decision
+        and keeps a running record of your treatment plan.
+      </Text>
       <UseQueryResultView
         query={query}
         renderData={useCallback(
@@ -68,7 +74,17 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
   },
-  title: theme.fonts.titleLarge,
+  title: {
+    ...theme.fonts.sectionTitle,
+    color: theme.colors.ink,
+    marginTop: theme.spaces.sm,
+    marginBottom: theme.spaces.xs,
+  },
+  subtitle: {
+    ...theme.fonts.bodyMedium,
+    fontSize: 14,
+    color: theme.colors.ink2,
+  },
 });
 
 export { AlgorithmList };

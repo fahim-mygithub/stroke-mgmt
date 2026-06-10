@@ -3,6 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import type { StyleProp, ViewStyle } from 'react-native';
 import type { Article, ArticleId } from '@/domain/models/Article';
 import { theme } from '@/view/theme';
+import { Eyebrow } from '@/view/components';
 import { UseQueryResultView } from '@/view/lib/UseQueryResultView';
 import { ArticleListError } from '@/view/HomeScreen/components/ArticleList/ArticleListError';
 import { ArticleListLoading } from '@/view/HomeScreen/components/ArticleList/ArticleListLoading';
@@ -12,14 +13,13 @@ import type { TagState } from '@/view/HomeScreen/components/TagList';
 import { TagList } from '@/view/HomeScreen/components/TagList';
 import { filterArticlesOnHomeOrByTags } from '@/domain/services/filterArticlesOnHomeOrByTags';
 import { DeferredPromise } from '@/view/HomeScreen/components/ArticleList/DeferredPromise';
-import { ArticleListCarousel } from '@/view/HomeScreen/components/ArticleList/ArticleListCarousel';
+import { ArticleListGrid } from '@/view/HomeScreen/components/ArticleList/ArticleListGrid';
 import { ArticleListEmpty } from '@/view/HomeScreen/components/ArticleList/ArticleListEmpty';
 
 type ArticleListProps = {
   getAllArticles: (cb: (as: Article[]) => void) => Promise<Article[]>;
   getAllTags: (cb: (ts: Tag[]) => void) => Promise<Tag[]>;
   onSelectArticle: (id: ArticleId) => void;
-  listWidth: number;
   maxItemsPerPage?: number;
   style?: StyleProp<ViewStyle>;
 };
@@ -30,7 +30,6 @@ function ArticleList({
   getAllArticles,
   getAllTags,
   onSelectArticle,
-  listWidth,
   maxItemsPerPage = 5,
   style = {},
 }: ArticleListProps) {
@@ -87,7 +86,11 @@ function ArticleList({
   const activeTagFilters = tagStates.filter((t) => t.active).map((t) => t.tag);
   return (
     <View style={style}>
-      <Text style={styles.title}>Articles</Text>
+      <Eyebrow>REFERENCE</Eyebrow>
+      <Text style={styles.title}>Library</Text>
+      <Text style={styles.subtitle}>
+        Background, procedure demos, trial reviews, and case studies.
+      </Text>
       {tagQuery.isSuccess && (
         <TagList tags={tagStates} onToggle={handleToggleTagStates} />
       )}
@@ -101,15 +104,13 @@ function ArticleList({
             );
             if (filteredArticles.length === 0) return <ArticleListEmpty />;
             return (
-              <ArticleListCarousel
+              <ArticleListGrid
                 data={filteredArticles}
                 onSelectArticle={onSelectArticle}
-                listWidth={listWidth}
-                maxItemsPerPage={maxItemsPerPage}
               />
             );
           },
-          [activeTagFilters, listWidth, maxItemsPerPage, onSelectArticle]
+          [activeTagFilters, onSelectArticle]
         )}
         renderError={useCallback(
           (error) => (
@@ -130,7 +131,15 @@ function ArticleList({
 
 const styles = StyleSheet.create({
   title: {
-    ...theme.fonts.titleLarge,
+    ...theme.fonts.sectionTitle,
+    color: theme.colors.ink,
+    marginTop: theme.spaces.sm,
+    marginBottom: theme.spaces.xs,
+  },
+  subtitle: {
+    ...theme.fonts.bodyMedium,
+    fontSize: 14,
+    color: theme.colors.ink2,
   },
 });
 

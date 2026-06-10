@@ -4,6 +4,40 @@ Running notes on annual Expo SDK upgrade cycles. Add a new section per year; kee
 
 ---
 
+## 2026 — UI redesign port (Fahim)
+
+Ported the web design mockup (`stroke-mgmt-mockup/index.html`) into the actual RN app on branch `ui-redesign-port` (off `expo-sdk-upgrade-2026`). Full port in one push, mobile-first adaptation. Design + plan: `docs/plans/2026-06-09-stroke-mgmt-ui-redesign-port{-design,}.md`. Onion architecture preserved — all changes in `src/view/**` and `src/infrastructure/**`; domain untouched; the only new application addition is the `PdfExporter` port.
+
+### Two rendering surfaces (important for any future restyle)
+- **Native RN** (re-skin via `src/view/theme` tokens + components): top bar, home cards/sections/pills, intro slideshow, modals, summary screen.
+- **WebView HTML** (re-skin via `src/infrastructure/rendering/ejs/EjsRenderer/partials/style.ejs`): article body + algorithm pathways (switches, outcomes). The WebView CANNOT load the app's Inter font — its CSS uses `-apple-system, Segoe UI, Roboto, sans-serif`.
+
+### What changed
+- **Theme** (`src/view/theme`): green→blue mockup palette (`brand #1E4E8C`, canvas `#F7F5F2`, ink scale, brand-soft); added `radii.ts`; softened `elevations` to xs/sm/md/lg; **Inter** (400/500/600/700) via `@expo-google-fonts/inter`, loaded in `App.tsx` (splash held until fonts ready). Existing Material-style token names kept (remapped) so the recolor cascades.
+- **Components**: new `Card`, `Pill`, `Accordion`, `Eyebrow`; `IconButton` gained a `boxed` top-bar variant; Button/Checkbox restyled to brand.
+- **Screens**: home (pathway cards + responsive article grid + Pill filters), top bar + kebab, intro **slideshow** (replaces the old WebView-article + bottom-bar flow; dot progress, Skip, Prev/Next, "don't show again"), modals.
+- **Treatment summary + PDF (new feature)**: view-layer `TreatmentTrail` (provider + tested reducer) records each {algorithm, chosen outcome, score}; terminal outcomes render a "Complete & view summary" button in `outcomeList.ejs` that reuses the existing `nextpressed` bridge via a `__finish__:<index>` sentinel (no bridge/event-type changes); `TreatmentSummaryScreen` shows the decision path + Export PDF; `ExpoPrintPdfExporter` (expo-print + expo-sharing) behind a `PdfExporter` port. New deps: `@expo-google-fonts/inter`, `expo-print`, `expo-sharing` (+ `expo-sharing` config plugin).
+
+### Gotchas found this cycle
+| Symptom | Fix |
+| --- | --- |
+| `tsc` "fontFamily specified more than once" in ComponentErrorView | The type scale now carries `fontFamily`; put the spread before the monospace override. |
+| Native trail/summary/PDF showed `LKW &gt; 24 hrs` | CMS titles are HTML-encoded (WebView decodes, native doesn't). Added `decodeHtmlEntities` applied at trail-record time. |
+| Algorithm screen flashes "Oh no! Something went wrong!" for one frame | Pre-existing: `AlgorithmCollectionItem` renders a fallback while `renderedAlgorithm` is briefly null after query success. Harmless; resolves immediately. Not fixed this cycle. |
+| Orphaned home carousel files | The article list moved from a paginated carousel to `ArticleListGrid`; `ArticleListCarousel/Column/CarouselPaginationControl/useCarouselPaginationControls` are now dead code — left in place, remove next cycle. |
+
+### Verification
+- `npx tsc --noEmit` clean; `npx jest` 199/199 tests (same 4 pre-existing worker-crash suites); EjsRenderer snapshots regenerated (CSS + terminal button).
+- **Android emulator (Expo Go SDK 56)**: verified home, top bar + kebab menu, an algorithm pathway (outcome accordions + Continue chaining across 4 algorithms), the intro slideshow (dots/Skip/Next advancing 1→2 of 7), and the full terminal-outcome → treatment summary → Export PDF (share sheet) flow.
+
+### Not done / follow-ups
+- iOS device verification (needs Expo Go SDK 56 TestFlight slot or Apple Dev access — see prior section).
+- Remove the orphaned article-carousel files.
+- Search affordance in the top bar is a deferred no-op (icon only).
+- Branch not merged to `main`; redeploy the web preview from this branch if Dr. Lodi should review the redesign.
+
+---
+
 ## 2026 — SDK 55 → 56 (Fahim)
 
 Mid-cycle bump, done so the app can be tested on physical phones with free Expo Go: the App Store build of Expo Go only supports SDK 54 and the SDK 55 build is stuck in Apple review, but Expo Go for SDK 56 is available through a free TestFlight External Beta (https://testflight.apple.com/join/GZJxxfUU). Android Expo Go for any SDK installs from https://expo.dev/go.

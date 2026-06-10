@@ -1,6 +1,13 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import type { LayoutChangeEvent } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
+import {
+  useFonts,
+  Inter_400Regular,
+  Inter_500Medium,
+  Inter_600SemiBold,
+  Inter_700Bold,
+} from '@expo-google-fonts/inter';
 import type { Type as Router } from '@/view/Router';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { theme } from '@/view/theme';
@@ -16,6 +23,7 @@ import {
   initialWindowMetrics,
 } from 'react-native-safe-area-context';
 import { ErrorBoundary } from '@/view/error-handling';
+import { TreatmentTrailProvider } from '@/view/lib/TreatmentTrail';
 
 type AppProps = {
   onLayout?: (e: LayoutChangeEvent) => void;
@@ -27,8 +35,29 @@ function factory(Router: Router) {
 
     const headerScrollState = useHeaderScrollData();
 
+    const [fontsLoaded] = useFonts({
+      Inter_400Regular,
+      Inter_500Medium,
+      Inter_600SemiBold,
+      Inter_700Bold,
+    });
+
+    // Only let Root hide the splash screen once the Inter fonts are ready,
+    // otherwise the first paint flashes in the system font.
+    const handleLayout = useCallback(
+      (e: LayoutChangeEvent) => {
+        if (fontsLoaded) onLayout?.(e);
+      },
+      [fontsLoaded, onLayout]
+    );
+
+    if (!fontsLoaded) {
+      // Keep the splash up (don't forward onLayout) until fonts load.
+      return <GestureHandlerRootView style={{ flex: 1 }} />;
+    }
+
     return (
-      <GestureHandlerRootView style={{ flex: 1 }} onLayout={onLayout}>
+      <GestureHandlerRootView style={{ flex: 1 }} onLayout={handleLayout}>
         <SafeAreaProvider initialMetrics={initialWindowMetrics}>
           <ErrorBoundary>
             <NavigationContainer
@@ -38,7 +67,9 @@ function factory(Router: Router) {
               <QueryClientProvider client={queryClient}>
                 <HeaderScrollContext.Provider value={headerScrollState}>
                   <SnackbarProvider>
-                    <Router />
+                    <TreatmentTrailProvider>
+                      <Router />
+                    </TreatmentTrailProvider>
                   </SnackbarProvider>
                 </HeaderScrollContext.Provider>
               </QueryClientProvider>

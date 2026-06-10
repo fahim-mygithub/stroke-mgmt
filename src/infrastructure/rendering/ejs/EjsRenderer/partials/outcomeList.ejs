@@ -1,7 +1,7 @@
 <ul class="template outcomes__list">
   <h1 class="template outcomes__headline">Results</h1>
   <% if(data.algorithm.hasOutcomes()) { %>
-  <% for(const outcome of data.algorithm.getDisplayedOutcomes()) { %>
+  <% data.algorithm.getDisplayedOutcomes().forEach(function(outcome, i) { %>
   <li class="template outcomes__list-item">
     <details class="template outcomes__item" <%- data.algorithm.getDisplayedOutcomes().length === 1 ? 'open' : '' %>>
       <summary><span class="template outcomes__title"><%- outcome.getTitle() %><span></summary>
@@ -10,10 +10,17 @@
       <button class="template outcomes__button" data-next-id="<%- outcome.getNext() %>">
         Continue
       </button>
+      <% } else { %>
+      <%# Terminal outcome: reuse the nextpressed bridge with a sentinel id that %>
+      <%# encodes the displayed-outcome index so the app can record the choice %>
+      <%# and navigate to the treatment summary. %>
+      <button class="template outcomes__button" data-next-id="__finish__:<%- i %>">
+        Complete &amp; view summary
+      </button>
       <% } %>
     </details>
   </li>
-  <% } %>
+  <% }) %>
   <% } else { %>
   <%- include('noOutcomesYet') %>
   <% } %>

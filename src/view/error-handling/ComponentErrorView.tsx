@@ -51,8 +51,9 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: theme.colors.onErrorContainer,
-    fontFamily: Platform.OS === 'android' ? 'monospace' : 'Courier New',
     ...theme.fonts.bodyMedium,
+    // keep error output monospaced (override the scale's Inter family)
+    fontFamily: Platform.OS === 'android' ? 'monospace' : 'Courier New',
   },
 });
 

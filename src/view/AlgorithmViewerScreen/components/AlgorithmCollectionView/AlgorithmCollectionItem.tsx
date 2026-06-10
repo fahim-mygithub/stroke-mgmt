@@ -6,12 +6,19 @@ import type {
   AlgorithmId,
   RenderedAlgorithm,
 } from '@/domain/models/Algorithm';
+import { ScoredAlgorithm } from '@/domain/models/Algorithm';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { UseQueryResultView } from '@/view/lib/UseQueryResultView';
 import { AlgorithmView } from '@/view/AlgorithmViewerScreen/components/AlgorithmView';
 import { LoadingSpinnerView } from '@/view/components';
 import type { ArticleId } from '@/domain/models/Article';
 import { ScreenErrorView } from '@/view/error-handling';
+import type { TreatmentStep } from '@/view/lib/TreatmentTrail';
+import { decodeHtmlEntities } from '@/view/lib/decodeHtmlEntities';
+
+// Sentinel id emitted by a terminal outcome's "Complete & view summary" button
+// (see outcomeList.ejs). Encodes the chosen displayed-outcome index.
+const FINISH_PREFIX = '__finish__:';
 
 type Props = {
   id: AlgorithmId;
@@ -26,9 +33,41 @@ type Props = {
   width: number;
   onPressArticleLink: (id: ArticleId) => void;
   onPressExternalLink: (url: string) => void;
+  onRecordStep: (step: TreatmentStep) => void;
+  onReachSummary: () => void;
   onFirstLayout: () => void;
   style?: StyleProp<ViewStyle>;
 };
+
+// Resolves which outcome the user chose from the next-id the WebView reported,
+// then records the step into the treatment trail. Returns true if this was a
+// terminal "finish" choice (no further algorithm to append).
+function recordChosenStep(
+  nextId: AlgorithmId,
+  algorithm: Algorithm,
+  onRecordStep: (step: TreatmentStep) => void
+): boolean {
+  const nextIdStr = nextId.toString();
+  const isFinish = nextIdStr.startsWith(FINISH_PREFIX);
+  const outcomes = algorithm.getDisplayedOutcomes();
+
+  const chosen = isFinish
+    ? outcomes[Number(nextIdStr.slice(FINISH_PREFIX.length))]
+    : outcomes.find((o) => String(o.getNext()) === nextIdStr);
+
+  const score =
+    algorithm instanceof ScoredAlgorithm ? algorithm.calculateScore() : null;
+
+  onRecordStep({
+    algorithmId: algorithm.getId().toString(),
+    algorithmTitle: decodeHtmlEntities(algorithm.getTitle()),
+    outcomeId: isFinish ? nextIdStr : String(chosen?.getNext() ?? nextIdStr),
+    outcomeTitle: chosen ? decodeHtmlEntities(chosen.getTitle()) : null,
+    score,
+  });
+
+  return isFinish;
+}
 
 function BaseAlgorithmCollectionItem({
   id,
@@ -40,6 +79,8 @@ function BaseAlgorithmCollectionItem({
   width,
   onPressArticleLink,
   onPressExternalLink,
+  onRecordStep,
+  onReachSummary,
   onFirstLayout,
   style = {},
 }: Props) {
@@ -79,10 +120,15 @@ function BaseAlgorithmCollectionItem({
   );
 
   const handleNextAlgorithm = useCallback(
-    (nextId: AlgorithmId) => {
+    (nextId: AlgorithmId, thisAlgorithm: Algorithm) => {
+      const isFinish = recordChosenStep(nextId, thisAlgorithm, onRecordStep);
+      if (isFinish) {
+        onReachSummary();
+        return;
+      }
       appendToCollection(uuid, nextId);
     },
-    [appendToCollection, uuid]
+    [appendToCollection, uuid, onRecordStep, onReachSummary]
   );
 
   return (

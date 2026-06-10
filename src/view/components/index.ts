@@ -4,3 +4,7 @@ export { TextButton } from '@/view/components/TextButton';
 export { LoadingSpinnerView } from '@/view/components/LoadingSpinnerView';
 export { Checkbox } from '@/view/components/Checkbox';
 export { Banner } from '@/view/components/Banner';
+export { Card } from '@/view/components/Card';
+export { Pill } from '@/view/components/Pill';
+export { Accordion } from '@/view/components/Accordion';
+export { Eyebrow } from '@/view/components/Eyebrow';

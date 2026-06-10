@@ -11,6 +11,7 @@ import type { Type as DisclaimerModal } from '@/view/DisclaimerModal';
 import type { Type as ArticleViewerScreen } from '@/view/ArticleViewerScreen';
 import type { Type as AlgorithmViewerScreen } from '@/view/AlgorithmViewerScreen';
 import type { Type as AboutUsScreen } from '@/view/AboutUsScreen';
+import type { Type as TreatmentSummaryScreen } from '@/view/TreatmentSummaryScreen';
 import type { ArticleId } from '@/domain/models/Article';
 import type { AlgorithmId } from '@/domain/models/Algorithm';
 import { useShouldShowIntroSequence } from '@/view/lib/shouldShowIntroSequence';
@@ -29,6 +30,7 @@ type AppNavigationParams = {
   AlgorithmViewerScreen: { id: AlgorithmId };
   AboutUsScreen: undefined;
   LicenseScreen: undefined;
+  TreatmentSummaryScreen: undefined;
 };
 
 type RootNavigationParams = {
@@ -49,6 +51,7 @@ function factory(
   ArticleViewerScreen: ArticleViewerScreen,
   AlgorithmViewerScreen: AlgorithmViewerScreen,
   AboutUsScreen: AboutUsScreen,
+  TreatmentSummaryScreen: TreatmentSummaryScreen,
   Menu: Menu
 ) {
   function AppNavigation() {
@@ -99,6 +102,11 @@ function factory(
           component={AlgorithmViewerScreen}
           options={{ title: '' }}
         />
+        <AppStack.Screen
+          name="TreatmentSummaryScreen"
+          component={TreatmentSummaryScreen}
+          options={{ title: '' }}
+        />
       </AppStack.Navigator>
     );
   }
@@ -143,6 +151,7 @@ factory.$inject = [
   'ArticleViewerScreen',
   'AlgorithmViewerScreen',
   'AboutUsScreen',
+  'TreatmentSummaryScreen',
   'Menu',
 ];
 
