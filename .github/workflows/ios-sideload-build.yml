@@ -16,12 +16,19 @@ on:
     branches: [app-store-readiness-blockers]
     paths: ['.github/workflows/ios-sideload-build.yml']
 
-# build-trigger: 3
+# build-trigger: 4
 
 jobs:
   build-ipa:
     runs-on: macos-15
     timeout-minutes: 90
+    env:
+      # SDK 56's expo-modules-jsi declares swift-tools-version 6.2, which needs
+      # Xcode 26.x (runner default is 16.4 / Swift 6.1). Stay below 26.5 —
+      # its SwiftPM scheme resolution breaks this same build phase
+      # (expo/expo#46326). The build-xcframework script forwards DEVELOPER_DIR
+      # into its nested xcodebuild.
+      DEVELOPER_DIR: /Applications/Xcode_26.3.app/Contents/Developer
     steps:
       - uses: actions/checkout@v4
 
