@@ -16,7 +16,7 @@ on:
     branches: [app-store-readiness-blockers]
     paths: ['.github/workflows/ios-sideload-build.yml']
 
-# build-trigger: 2
+# build-trigger: 3
 
 jobs:
   build-ipa:
@@ -45,12 +45,31 @@ jobs:
       - name: Install CocoaPods
         run: pod install --project-directory=ios
 
+      - name: Toolchain diagnostics
+        run: |
+          xcodebuild -version
+          xcode-select -p
+          ls /Applications | grep -i '^Xcode' || true
+
+      # expo-modules-jsi's pod script phase builds a local SwiftPM package with
+      # a nested `xcodebuild -disableAutomaticPackageResolution`, which fails
+      # with "Could not resolve package dependencies:" when no resolved
+      # workspace state exists yet (fresh CI checkout). Resolve it up front.
+      - name: Pre-resolve ExpoModulesJSI SwiftPM state
+        run: |
+          cd node_modules/expo-modules-jsi/apple
+          xcodebuild -resolvePackageDependencies \
+            -scheme ExpoModulesJSI \
+            -destination 'generic/platform=iOS' \
+            -derivedDataPath .DerivedData
+
       - name: Build unsigned archive
         run: |
           set -o pipefail
           WORKSPACE=$(ls -d ios/*.xcworkspace | head -1)
           SCHEME=$(basename "$WORKSPACE" .xcworkspace)
           echo "Building scheme '$SCHEME' from '$WORKSPACE'"
+          mkdir -p build
           xcodebuild \
             -workspace "$WORKSPACE" \
             -scheme "$SCHEME" \
@@ -61,7 +80,15 @@ jobs:
             CODE_SIGNING_ALLOWED=NO \
             CODE_SIGNING_REQUIRED=NO \
             CODE_SIGN_IDENTITY="" \
-            | xcbeautify --renderer github-actions
+            2>&1 | tee build/xcodebuild-raw.log | xcbeautify --renderer github-actions
+
+      - name: Upload raw xcodebuild log
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcodebuild-raw-log
+          path: build/xcodebuild-raw.log
+          retention-days: 7
 
       - name: Package IPA
         run: |
