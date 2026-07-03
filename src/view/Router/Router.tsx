@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useCallback } from 'react';
 import type {
   NavigatorScreenParams,
   CompositeScreenProps,
@@ -15,6 +15,7 @@ import type { Type as TreatmentSummaryScreen } from '@/view/TreatmentSummaryScre
 import type { ArticleId } from '@/domain/models/Article';
 import type { AlgorithmId } from '@/domain/models/Algorithm';
 import { useShouldShowIntroSequence } from '@/view/lib/shouldShowIntroSequence';
+import { useDisclaimerGate } from '@/view/lib/useDisclaimerGate';
 import { LoadingSpinnerView } from '@/view/components';
 import { Header } from '@/view/Router/Header';
 import type { Type as Menu } from '@/view/Router/Menu';
@@ -54,8 +55,17 @@ function factory(
   TreatmentSummaryScreen: TreatmentSummaryScreen,
   Menu: Menu
 ) {
-  function AppNavigation() {
+  function AppNavigation({ navigation }: RootNavigationProps<'App'>) {
     const shouldShowFactsAndSignsOrLoading = useShouldShowIntroSequence();
+
+    // Enforce the medical disclaimer on every launch, independent of the intro
+    // sequence: a user who has permanently dismissed the intro must still have
+    // accepted the disclaimer before reaching any content.
+    const openDisclaimer = useCallback(
+      () => navigation.navigate('DisclaimerModal'),
+      [navigation]
+    );
+    useDisclaimerGate(openDisclaimer);
 
     if (shouldShowFactsAndSignsOrLoading === 'loading')
       return <LoadingSpinnerView />;
@@ -122,7 +132,9 @@ function factory(
         <RootStack.Screen
           name="DisclaimerModal"
           component={DisclaimerModal}
-          options={{ presentation: 'transparentModal' }}
+          // gestureEnabled:false blocks swipe-to-dismiss; the modal itself
+          // blocks hardware back until the disclaimer is accepted.
+          options={{ presentation: 'transparentModal', gestureEnabled: false }}
         />
         <RootStack.Screen
           name="EvaluatingPatientModal"

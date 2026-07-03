@@ -1,4 +1,9 @@
-import { AlgorithmId } from '@/domain/models/Algorithm';
+import {
+  AlgorithmId,
+  AlgorithmInfo,
+  Outcome,
+  TextAlgorithm,
+} from '@/domain/models/Algorithm';
 import { Article, ArticleId, Designation } from '@/domain/models/Article';
 import { NodeFileSystem } from '@/infrastructure/file-system/node/NodeFileSystem';
 import { FakeAlgorithmRepository } from '@/infrastructure/persistence/fake/FakeAlgorithmRepository';
@@ -46,6 +51,34 @@ describe('EjsAlgorithmRenderer', () => {
       const renderer = new EjsRenderer(fs);
       const result = await renderer.renderAlgorithm(scoredAlgo);
       expect(result).toMatchSnapshot();
+    });
+
+    it('renders no button for a next-less outcome tagged Halt', async () => {
+      const info = new AlgorithmInfo({
+        id: new AlgorithmId('2'),
+        title: 'Halting algorithm',
+        body: 'body',
+        summary: 'summary',
+        thumbnail: new Image('/img.png'),
+        outcomes: [
+          new Outcome({
+            title: 'Not Stable',
+            body: 'Stabilize before continuing',
+            terminalBehavior: 'Halt',
+          }),
+          new Outcome({ title: 'Done', body: 'All done' }),
+        ],
+        shouldShowOnHomeScreen: true,
+        lastUpdated: new Date(0),
+        citations: [],
+      });
+
+      const renderer = new EjsRenderer(fs);
+      const html = await renderer.renderAlgorithm(new TextAlgorithm({ info }));
+      // Halt outcome (index 0) gets no finish button; the completable
+      // terminal outcome (index 1) still gets one.
+      expect(html).not.toContain('__finish__:0');
+      expect(html).toContain('__finish__:1');
     });
 
     it('should render article title and html', async () => {

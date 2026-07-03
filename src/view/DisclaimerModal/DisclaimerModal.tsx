@@ -1,4 +1,4 @@
-import React, { useCallback } from 'react';
+import React, { useCallback, useEffect, useRef } from 'react';
 import { View, StyleSheet } from 'react-native';
 import type { RenderDisclaimerAction } from '@/application/RenderDisclaimerAction';
 import type { RootNavigationProps } from '@/view/Router';
@@ -7,7 +7,7 @@ import { DisclaimerView } from '@/view/DisclaimerModal/DisclaimerView';
 import { UseQueryResultView } from '@/view/lib/UseQueryResultView';
 import { LoadingSpinnerView, Button } from '@/view/components';
 import { theme } from '@/view/theme';
-import { setSeenDisclaimer } from '@/view/lib/useHasSeenDisclaimer';
+import { acceptDisclaimer } from '@/view/lib/disclaimerGate';
 import { DisclaimerErrorView } from '@/view/DisclaimerModal/DisclaimerErrorView';
 
 function factory(renderDisclaimerAction: RenderDisclaimerAction) {
@@ -24,8 +24,20 @@ function factory(renderDisclaimerAction: RenderDisclaimerAction) {
       retry: false,
     });
 
+    // The disclaimer is a hard gate: block any dismissal (hardware back,
+    // programmatic pop) until the user has explicitly accepted via "Got it".
+    const acceptedRef = useRef(false);
+    useEffect(
+      () =>
+        navigation.addListener('beforeRemove', (e) => {
+          if (!acceptedRef.current) e.preventDefault();
+        }),
+      [navigation]
+    );
+
     const handleDismiss = useCallback(() => {
-      setSeenDisclaimer();
+      acceptedRef.current = true;
+      acceptDisclaimer();
       navigation.goBack();
     }, [navigation]);
 

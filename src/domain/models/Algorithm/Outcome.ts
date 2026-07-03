@@ -2,11 +2,14 @@ import type { Criterion } from '@/domain/models/Algorithm/Criterion';
 import { NoCriterion } from '@/domain/models/Algorithm/Criterion';
 import type { AlgorithmId } from '@/domain/models/Algorithm/AlgorithmId';
 
+type TerminalBehavior = 'Complete' | 'Halt';
+
 type OutcomeParams = {
   title: string;
   body: string;
   criterion?: Criterion;
   next?: AlgorithmId;
+  terminalBehavior?: TerminalBehavior;
 };
 
 class Outcome {
@@ -18,11 +21,20 @@ class Outcome {
 
   private next: AlgorithmId | null;
 
-  constructor({ title, body, criterion, next }: OutcomeParams) {
+  private terminalBehavior: TerminalBehavior;
+
+  constructor({
+    title,
+    body,
+    criterion,
+    next,
+    terminalBehavior,
+  }: OutcomeParams) {
     this.title = title;
     this.body = body;
     this.criterion = criterion ?? new NoCriterion();
     this.next = next ?? null;
+    this.terminalBehavior = terminalBehavior ?? 'Complete';
   }
 
   getTitle() {
@@ -41,6 +53,16 @@ class Outcome {
     return this.next;
   }
 
+  getTerminalBehavior() {
+    return this.terminalBehavior;
+  }
+
+  // A next-less outcome tagged Halt in the CMS means "resolve this, then
+  // re-assess" — the pathway neither continues nor completes.
+  haltsPathway() {
+    return this.next === null && this.terminalBehavior === 'Halt';
+  }
+
   checkCriterion(v: number) {
     return this.criterion.check(v);
   }
@@ -51,6 +73,7 @@ class Outcome {
       body: this.getBody(),
       criterion: this.getCriterion(),
       next: this.getNext() ?? undefined,
+      terminalBehavior: this.getTerminalBehavior(),
       ...params,
     });
   }

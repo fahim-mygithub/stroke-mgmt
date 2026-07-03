@@ -4,6 +4,7 @@ import { AlgorithmId } from '@/domain/models/Algorithm';
 import type { Algorithm } from '@/domain/models/Algorithm';
 import { theme } from '@/view/theme';
 import { AlgorithmItem } from '@/view/HomeScreen/components/AlgorithmList/AlgorithmItem';
+import { decodeHtmlEntities } from '@/view/lib/decodeHtmlEntities';
 
 type Props = {
   data: Algorithm[];
@@ -34,7 +35,7 @@ function AlgorithmListFilled({ data, onSelectAlgorithm }: Props) {
   const items = data.map((algorithm) => (
     <AlgorithmItem
       id={algorithm.getId().toString()}
-      name={algorithm.getTitle()}
+      name={decodeHtmlEntities(algorithm.getTitle())}
       key={algorithm.getId().toString()}
       body={algorithm.getSummary()}
       imageUri={algorithm.getThumbnail().getUri()}

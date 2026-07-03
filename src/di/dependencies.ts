@@ -76,7 +76,7 @@ export const module = {
     'value',
     !production && useLocalCms ? `http://${localhost}:1337` : liveCmsUrl,
   ],
-  currentVersion: ['value', new Version(1, 1, 1)],
+  currentVersion: ['value', new Version(1, 1, 2)],
 
   // DOMAIN
   imageCache: ['type', ImageCache],

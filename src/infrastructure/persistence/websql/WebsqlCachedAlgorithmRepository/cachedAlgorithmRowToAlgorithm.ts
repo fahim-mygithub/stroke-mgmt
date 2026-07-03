@@ -51,6 +51,7 @@ function outcomesJsonToOutcomes(outcomesJson: string): Outcome[] {
         body: d.body,
         criterion: criterionDataToCriterion(d.criterion),
         next: d.next ? new AlgorithmId(d.next) : undefined,
+        terminalBehavior: d.terminalBehavior,
       })
   );
 }

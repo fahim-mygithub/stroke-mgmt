@@ -62,6 +62,40 @@ describe('StrapiArticleRepository', () => {
       );
     });
 
+    it('should sanitize script out of the article body', async () => {
+      const imageRepo = new FakeImageRepository();
+      const maliciousArticle = {
+        data: {
+          id: 9,
+          attributes: {
+            Title: 'Compromised',
+            Body: '<p>safe</p><script>fetch("https://evil.example")</script>',
+            Designation: 'Article',
+            Summary: 'x',
+            Thumbnail: { data: null },
+            ArticleId: '00000000-0000-0000-0000-000000000009',
+            createdAt: '2023-01-28T16:03:39.318Z',
+            updatedAt: '2023-01-28T16:03:44.659Z',
+            publishedAt: '2023-01-28T16:03:44.569Z',
+            tags: { data: [] },
+            citations: [],
+          },
+        },
+      };
+      const repo = new StrapiArticleRepository(
+        'myhost.com',
+        makeFetch(maliciousArticle),
+        imageRepo,
+        mockNetworkInfo
+      );
+
+      const article = await repo.getById(new ArticleId('9'));
+
+      expect(article.getHtml()).toContain('<p>safe</p>');
+      expect(article.getHtml()).not.toContain('<script');
+      expect(article.getHtml()).not.toContain('evil.example');
+    });
+
     it('should get articles with tags', async () => {
       const imageRepo = new FakeImageRepository();
       const repo = new StrapiArticleRepository(

@@ -3,6 +3,7 @@ import { Article, ArticleId, Designation } from '@/domain/models/Article';
 import { Citation } from '@/domain/models/Citation';
 import { Image } from '@/domain/models/Image';
 import { Tag } from '@/domain/models/Tag';
+import { sanitizeCmsHtml } from '@/infrastructure/html-processing/sanitize/sanitizeCmsHtml';
 import type { StrapiArticleData } from '@/infrastructure/persistence/strapi/StrapiApiResponse';
 
 export const strapiResponseToArticle = (
@@ -31,8 +32,8 @@ export const strapiResponseToArticle = (
 
   return new Article({
     id: new ArticleId(id.toString()),
-    title: attributes.Title,
-    html: attributes.Body,
+    title: sanitizeCmsHtml(attributes.Title),
+    html: sanitizeCmsHtml(attributes.Body),
     designation,
     summary: attributes.Summary ?? undefined,
     thumbnail,
@@ -46,6 +47,8 @@ export const strapiResponseToArticle = (
           td.attributes.Description ?? undefined
         )
     ),
-    citations: attributes.citations.map((c) => new Citation(c.Citation)),
+    citations: attributes.citations.map(
+      (c) => new Citation(sanitizeCmsHtml(c.Citation))
+    ),
   });
 };

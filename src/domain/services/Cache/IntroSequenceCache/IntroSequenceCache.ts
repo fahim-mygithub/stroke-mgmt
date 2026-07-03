@@ -50,12 +50,15 @@ class IntroSequenceCache {
 
     try {
       const cacheResult = await this.cachedIntroSequenceRepository.get();
+      // Fire-and-forget background revalidation. If the source is unreachable
+      // it rejects; we have already returned cached data, so swallow the error
+      // rather than letting it surface as an unhandled promise rejection.
       handleCacheStale(
         this.cachedIntroSequenceRepository,
         getFromSource,
         cacheResult,
         onStale
-      );
+      ).catch(() => {});
       return cacheResult;
     } catch (e) {
       return getFromSource();

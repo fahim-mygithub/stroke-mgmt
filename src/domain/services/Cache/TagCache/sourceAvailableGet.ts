@@ -78,12 +78,15 @@ async function sourceAvailableGet(
       updateCache(cacheRepository, sourceResult, cacheResult);
       return sourceResult;
     }
+    // Fire-and-forget background revalidation. If the source is unreachable it
+    // rejects; we have already returned cached data, so swallow the error here
+    // rather than letting it surface as an unhandled promise rejection.
     updateCacheAndRunCallbackIfStale(
       cacheRepository,
       sourcePromise,
       cacheResult,
       onStaleCallback
-    );
+    ).catch(() => {});
     return cacheResult;
   } catch {
     return sourcePromise;

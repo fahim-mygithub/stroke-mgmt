@@ -177,13 +177,16 @@ async function sourceAvailableGetMultiple(
 
   try {
     const cacheResult = await cachePromise;
+    // Fire-and-forget background revalidation. If the source is unreachable it
+    // rejects; we have already returned cached data, so swallow the error here
+    // rather than letting it surface as an unhandled promise rejection.
     updateCacheAndRunCallbackIfStale(
       imageCache,
       cacheRepository,
       sourcePromise,
       cachePromise,
       onStaleCallback
-    );
+    ).catch(() => {});
     const cachedResultWithThumbnails =
       await getAndAddCachedThumbnailForArticles(imageCache, cacheResult);
     return await getAndAddCachedImagesForArticles(

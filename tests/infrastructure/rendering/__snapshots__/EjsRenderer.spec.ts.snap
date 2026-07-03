@@ -1840,6 +1840,7 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
         Continue
       </button>
       
+      
     </details>
   </li>
   
@@ -1854,6 +1855,7 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
       <button class="template outcomes__button" data-next-id="__finish__:1">
         Complete &amp; view summary
       </button>
+      
       
     </details>
   </li>

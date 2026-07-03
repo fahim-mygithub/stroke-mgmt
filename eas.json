@@ -27,6 +27,24 @@
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      // Inert until store accounts exist. Fill these in once Sam has an
+      // Apple Developer membership and a Google Play Console service account,
+      // then run `eas submit -p ios|android --profile production`.
+      "ios": {
+        // Apple ID email used to sign in to App Store Connect.
+        "appleId": "REPLACE_WITH_APPLE_ID_EMAIL",
+        // App Store Connect app's numeric Apple ID (App information page).
+        "ascAppId": "REPLACE_WITH_ASC_APP_ID",
+        // 10-char Apple Developer Team ID (membership page).
+        "appleTeamId": "REPLACE_WITH_APPLE_TEAM_ID"
+      },
+      "android": {
+        // Path to the Play Console service-account JSON key (keep out of git).
+        "serviceAccountKeyPath": "./play-service-account.json",
+        // First submission must go to "internal"; promote in Play Console.
+        "track": "internal"
+      }
+    }
   }
 }

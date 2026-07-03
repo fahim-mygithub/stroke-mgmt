@@ -2,7 +2,7 @@ module.exports = {
   expo: {
     name: 'Ischemic Stroke',
     slug: 'stroke-mgmt',
-    version: '1.1.1',
+    version: '1.1.2',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
     jsEngine: 'hermes',
@@ -15,6 +15,36 @@ module.exports = {
     ios: {
       supportsTablet: true,
       bundleIdentifier: 'com.strokemgmtapp.strokemgmt',
+      // App Store rejects re-used build numbers. Bump on every TestFlight/store
+      // upload (Android's equivalent is `android.versionCode` below).
+      buildNumber: '1',
+      // Privacy manifest (PrivacyInfo.xcprivacy). The app collects no data and
+      // does no tracking; it only touches "required reason" APIs transitively:
+      //   CA92.1 – UserDefaults (AsyncStorage)
+      //   C617.1 – File timestamp (expo-file-system)
+      //   E174.1 – Disk space      (expo-file-system)
+      // Expo merges these with any module-injected entries during prebuild.
+      privacyManifests: {
+        NSPrivacyTracking: false,
+        NSPrivacyTrackingDomains: [],
+        NSPrivacyCollectedDataTypes: [],
+        NSPrivacyAccessedAPITypes: [
+          {
+            NSPrivacyAccessedAPIType:
+              'NSPrivacyAccessedAPICategoryUserDefaults',
+            NSPrivacyAccessedAPITypeReasons: ['CA92.1'],
+          },
+          {
+            NSPrivacyAccessedAPIType:
+              'NSPrivacyAccessedAPICategoryFileTimestamp',
+            NSPrivacyAccessedAPITypeReasons: ['C617.1'],
+          },
+          {
+            NSPrivacyAccessedAPIType: 'NSPrivacyAccessedAPICategoryDiskSpace',
+            NSPrivacyAccessedAPITypeReasons: ['E174.1'],
+          },
+        ],
+      },
     },
     android: {
       adaptiveIcon: {

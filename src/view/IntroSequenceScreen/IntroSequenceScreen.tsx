@@ -13,7 +13,6 @@ import type { RenderArticleByIdAction } from '@/application/RenderArticleByIdAct
 import { IntroArticleView } from '@/view/IntroSequenceScreen/IntroArticleView';
 import { IntroSequenceBottomBar } from '@/view/IntroSequenceScreen/IntroSequenceBottomBar';
 import { useShouldShow } from '@/view/IntroSequenceScreen/useShouldShow';
-import { useHasSeenDisclaimer } from '@/view/lib/useHasSeenDisclaimer';
 import type { ArticleId } from '@/domain/models/Article';
 import {
   isFirstIndex,
@@ -31,12 +30,6 @@ function factory(
     route,
   }: AppNavigationProps<'IntroSequenceScreen'>) {
     useSetAndroidBottomNavigationBarColor(theme.colors.surface, 'dark');
-
-    const openDisclaimer = useCallback(() => {
-      navigation.navigate('DisclaimerModal');
-    }, [navigation]);
-
-    useHasSeenDisclaimer(openDisclaimer);
 
     const sequenceCursor = route.params.cursor;
     const setSequenceCursor = useCallback(

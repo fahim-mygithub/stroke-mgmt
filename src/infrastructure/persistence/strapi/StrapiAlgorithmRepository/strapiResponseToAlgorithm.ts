@@ -15,6 +15,7 @@ import {
 } from '@/domain/models/Algorithm';
 import { Citation } from '@/domain/models/Citation';
 import { Image } from '@/domain/models/Image';
+import { sanitizeCmsHtml } from '@/infrastructure/html-processing/sanitize/sanitizeCmsHtml';
 import type { StrapiAlgorithmData } from '@/infrastructure/persistence/strapi/StrapiApiResponse';
 
 export const strapiResponseToAlgorithm = (
@@ -34,7 +35,13 @@ export const strapiResponseToAlgorithm = (
   } = attributes;
 
   const outcomes = outcomeData.map(
-    ({ Title: tData, Body: bData, criterion: critData, next: nextData }) => {
+    ({
+      Title: tData,
+      Body: bData,
+      criterion: critData,
+      next: nextData,
+      TerminalBehavior: terminalData,
+    }) => {
       let criterion: Criterion = new NoCriterion();
 
       if (critData?.Type === 'GreaterThan') {
@@ -47,7 +54,13 @@ export const strapiResponseToAlgorithm = (
         ? new AlgorithmId(nextData.data.id.toString(10))
         : undefined;
 
-      return new Outcome({ title: tData, body: bData, criterion, next });
+      return new Outcome({
+        title: sanitizeCmsHtml(tData),
+        body: sanitizeCmsHtml(bData),
+        criterion,
+        next,
+        terminalBehavior: terminalData ?? undefined,
+      });
     }
   );
 
@@ -58,13 +71,15 @@ export const strapiResponseToAlgorithm = (
     );
   }
 
-  const citations = citationData.map((c) => new Citation(c.Citation));
+  const citations = citationData.map(
+    (c) => new Citation(sanitizeCmsHtml(c.Citation))
+  );
 
   const info = new AlgorithmInfo({
     id: new AlgorithmId(algoId.toString()),
-    title: Title,
+    title: sanitizeCmsHtml(Title),
     summary: Summary,
-    body: Body,
+    body: sanitizeCmsHtml(Body),
     outcomes,
     thumbnail,
     shouldShowOnHomeScreen: ShowOnHomeScreen ?? true,
@@ -79,10 +94,16 @@ export const strapiResponseToAlgorithm = (
     ({ id: switchId, Label, Description, levels }) =>
       new Switch({
         id: new SwitchId(switchId.toString()),
-        label: Label,
-        description: Description ?? undefined,
+        label: sanitizeCmsHtml(Label),
+        description:
+          Description === null ? undefined : sanitizeCmsHtml(Description),
         levels: levels.map(
-          (l) => new Level(new LevelId(l.id.toString()), l.Label, l.Value)
+          (l) =>
+            new Level(
+              new LevelId(l.id.toString()),
+              sanitizeCmsHtml(l.Label),
+              l.Value
+            )
         ),
       })
   );

@@ -16,3 +16,5 @@ web-build/
 debug
 
 docs/*
+# EAS submit: Google Play service-account key (never commit)
+play-service-account.json

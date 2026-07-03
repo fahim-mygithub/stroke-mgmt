@@ -24,6 +24,7 @@ function extractOutcomeData(outcome: Outcome): OutcomeData {
     body: outcome.getBody(),
     criterion: extractCriterionData(outcome.getCriterion()),
     next: outcome.getNext()?.toString() ?? null,
+    terminalBehavior: outcome.getTerminalBehavior(),
   };
 }
 

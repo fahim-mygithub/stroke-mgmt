@@ -8,7 +8,6 @@ import type {
   WebViewArticleLinkPressedEvent as ArticleLinkPressedEvent,
   WebViewLogEvent as LogEvent,
 } from '@/infrastructure/rendering/WebViewEvent/WebViewEvent';
-import { openURL as openUrl } from 'expo-linking';
 
 type HandlerCollection = {
   error?: (e: ErrorEvent['content']) => void;
@@ -53,13 +52,20 @@ class WebViewEventHandler {
   }
 
   handleLinkPressed(e: LinkPressedEvent) {
+    // CMS content is fetched unauthenticated, so links inside it are untrusted.
+    // Screens MUST register a `linkpressed` handler that routes through the
+    // ExternalLinkModal confirmation. With no handler we do nothing rather than
+    // silently navigating away to an attacker-controlled URL.
     if (!this.handlers.linkpressed) {
-      let url = e.content.href;
-      if (!url.match(/^https?:/)) url = `https://${url}`;
-      openUrl(url);
-    } else {
-      this.handlers.linkpressed(e.content);
+      if (__DEV__) {
+        // eslint-disable-next-line no-console
+        console.warn(
+          `Ignored link press with no registered handler: ${e.content.href}`
+        );
+      }
+      return;
     }
+    this.handlers.linkpressed(e.content);
   }
 
   handleArticleLinkPressed(e: ArticleLinkPressedEvent) {
@@ -68,8 +74,11 @@ class WebViewEventHandler {
   }
 
   handleLog(e: LogEvent) {
-    // eslint-disable-next-line no-console
-    console.log(e.content.message);
+    // WebView content is CMS-controlled; only surface its logs in development.
+    if (__DEV__) {
+      // eslint-disable-next-line no-console
+      console.log(e.content.message);
+    }
   }
 }
 

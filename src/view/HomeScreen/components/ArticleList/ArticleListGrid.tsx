@@ -4,6 +4,7 @@ import sanitizeHtml from 'sanitize-html';
 import type { Article, ArticleId } from '@/domain/models/Article';
 import { theme } from '@/view/theme';
 import { ArticleRow } from '@/view/HomeScreen/components/ArticleList/ArticleRow';
+import { decodeHtmlEntities } from '@/view/lib/decodeHtmlEntities';
 
 type Props = {
   data: Article[];
@@ -32,7 +33,7 @@ function ArticleListGrid({ data, onSelectArticle }: Props) {
           style={[styles.cell, { width: `${100 / columns}%` }]}
         >
           <ArticleRow
-            title={a.getTitle()}
+            title={decodeHtmlEntities(a.getTitle())}
             subtitle={a.getSummary((h) => sanitizeHtml(h, { allowedTags: [] }))}
             id={a.getId()}
             imageUri={a.getThumbnail().getUri()}

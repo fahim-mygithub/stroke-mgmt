@@ -29,6 +29,8 @@ export type OutcomeData = {
   body: string;
   criterion: CriterionData;
   next: string | null;
+  // Optional so rows cached before the field existed still parse.
+  terminalBehavior?: 'Complete' | 'Halt';
 };
 
 export type OutcomesJson = OutcomeData[];

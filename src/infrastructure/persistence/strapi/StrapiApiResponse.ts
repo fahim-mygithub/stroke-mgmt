@@ -48,6 +48,9 @@ export type StrapiAlgorithmData = {
       next: {
         data: { id: number } | null;
       };
+      // Added to the CMS schema later; older cached/stored responses lack
+      // it and pre-existing rows return null until re-saved.
+      TerminalBehavior?: 'Complete' | 'Halt' | null;
       criterion?:
         | {
             id: number;

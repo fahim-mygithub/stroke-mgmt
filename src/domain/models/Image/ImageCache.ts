@@ -33,7 +33,9 @@ class ImageCache {
   ): Promise<Image> {
     const result = await this.getCachedImageAsBase64Url(url);
     if (!(result instanceof NullImage)) return result;
-    this.saveImage(url);
+    // Fire-and-forget cache write; swallow failures so they do not surface as
+    // unhandled promise rejections. The source image is returned regardless.
+    this.saveImage(url).catch(() => {});
     return new Image(url);
   }
 
@@ -51,7 +53,9 @@ class ImageCache {
   ): Promise<Image> {
     const result = await this.getCachedImageAsFileUri(url);
     if (!(result instanceof NullImage)) return result;
-    this.saveImage(url);
+    // Fire-and-forget cache write; swallow failures so they do not surface as
+    // unhandled promise rejections. The source image is returned regardless.
+    this.saveImage(url).catch(() => {});
     return new Image(url);
   }
 
