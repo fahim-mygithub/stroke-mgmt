@@ -18,6 +18,10 @@ module.exports = {
       // App Store rejects re-used build numbers. Bump on every TestFlight/store
       // upload (Android's equivalent is `android.versionCode` below).
       buildNumber: '1',
+      // Only standard OS TLS (HTTPS to the CMS) — exempt from export
+      // compliance. Without this flag every ASC upload stalls in "Missing
+      // Compliance" until someone answers the questionnaire by hand.
+      config: { usesNonExemptEncryption: false },
       // Privacy manifest (PrivacyInfo.xcprivacy). The app collects no data and
       // does no tracking; it only touches "required reason" APIs transitively:
       //   CA92.1 – UserDefaults (AsyncStorage)
@@ -52,7 +56,9 @@ module.exports = {
         backgroundColor: '#000000',
       },
       package: 'com.strokemgmtapp.strokemgmt',
-      versionCode: 2,
+      // 3 was used on the abandoned release/ich branch (Aug 2024) and may have
+      // been uploaded to Play Console — skip it to avoid a rejected upload.
+      versionCode: 4,
     },
     androidNavigationBar: {
       barStyle: 'dark-content',
@@ -80,6 +86,24 @@ module.exports = {
     runtimeVersion: {
       policy: 'appVersion',
     },
-    plugins: ['expo-asset', 'expo-sqlite', 'expo-font', 'expo-sharing'],
+    plugins: [
+      'expo-asset',
+      'expo-sqlite',
+      'expo-font',
+      'expo-sharing',
+      // Since SDK 52 prebuild ignores the top-level `splash` key — the native
+      // launch screen only exists if this plugin generates it. The legacy flag
+      // keeps the full-image splash the published v1.1.1 app shipped with
+      // (default is a 100pt centered logo).
+      [
+        'expo-splash-screen',
+        {
+          image: './assets/splash.png',
+          resizeMode: 'contain',
+          backgroundColor: '#000000',
+          enableFullScreenImage_legacy: true,
+        },
+      ],
+    ],
   },
 };
