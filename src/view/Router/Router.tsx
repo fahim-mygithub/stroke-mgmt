@@ -19,6 +19,7 @@ import { useDisclaimerGate } from '@/view/lib/useDisclaimerGate';
 import { LoadingSpinnerView } from '@/view/components';
 import { Header } from '@/view/Router/Header';
 import type { Type as Menu } from '@/view/Router/Menu';
+import type { Type as SearchModal } from '@/view/SearchModal';
 import { LicenseScreen } from '@/view/LicenseScreen';
 import { EvaluatingPatientModal } from '@/view/EvaluatingPatientModal/EvaluatingPatientModal';
 import { ExternalLinkModal } from '@/view/ExternalLinkModal';
@@ -40,6 +41,7 @@ type RootNavigationParams = {
   EvaluatingPatientModal: { suggestedAlgorithmId: AlgorithmId };
   ExternalLinkModal: { url: string };
   HeaderMenuModal: { translateY: number };
+  SearchModal: undefined;
 };
 
 const AppStack = createStackNavigator<AppNavigationParams>();
@@ -53,7 +55,8 @@ function factory(
   AlgorithmViewerScreen: AlgorithmViewerScreen,
   AboutUsScreen: AboutUsScreen,
   TreatmentSummaryScreen: TreatmentSummaryScreen,
-  Menu: Menu
+  Menu: Menu,
+  SearchModal: SearchModal
 ) {
   function AppNavigation({ navigation }: RootNavigationProps<'App'>) {
     const shouldShowFactsAndSignsOrLoading = useShouldShowIntroSequence();
@@ -151,6 +154,11 @@ function factory(
           component={Menu}
           options={{ presentation: 'transparentModal' }}
         />
+        <RootStack.Screen
+          name="SearchModal"
+          component={SearchModal}
+          options={{ presentation: 'transparentModal' }}
+        />
       </RootStack.Navigator>
     );
   };
@@ -165,6 +173,7 @@ factory.$inject = [
   'AboutUsScreen',
   'TreatmentSummaryScreen',
   'Menu',
+  'SearchModal',
 ];
 
 export { factory };

@@ -30,9 +30,9 @@ function Header({ navigation, route, options, back }: Props) {
 
   const handleBack = useCallback(() => navigation.goBack(), [navigation]);
 
-  // Search is part of the redesigned top bar but not yet wired to a screen;
-  // keep the affordance visible with a deferred no-op handler.
-  const handleSearchPress = useCallback(() => {}, []);
+  const handleSearchPress = useCallback(() => {
+    navigation.navigate('SearchModal');
+  }, [navigation]);
 
   const { shouldShowNoInternetBanner, handleDismissNoInternetBanner } =
     useNoInternetBanner();

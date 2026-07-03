@@ -13,6 +13,7 @@ import { factory as ArticleViewerScreen } from '@/view/ArticleViewerScreen';
 import { factory as AlgorithmViewerScreen } from '@/view/AlgorithmViewerScreen';
 import { factory as DisclaimerModal } from '@/view/DisclaimerModal';
 import { factory as Router, menuFactory } from '@/view/Router';
+import { factory as SearchModal } from '@/view/SearchModal';
 import { factory as AboutUsScreen } from '@/view/AboutUsScreen';
 import { factory as IntroSequenceScreen } from '@/view/IntroSequenceScreen';
 import { factory as TreatmentSummaryScreen } from '@/view/TreatmentSummaryScreen';
@@ -141,6 +142,7 @@ export const module = {
   IntroSequenceScreen: ['factory', IntroSequenceScreen],
   TreatmentSummaryScreen: ['factory', TreatmentSummaryScreen],
   Menu: ['factory', menuFactory],
+  SearchModal: ['factory', SearchModal],
 
   // BUILT-INS
   // Wrapped in an arrow to preserve `this` on the web, where `fetch` is a Window
