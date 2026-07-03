@@ -85,12 +85,14 @@ class StrapiArticleRepository implements ArticleRepository {
   }
 
   async getByDesignation(designation: BaseDesignation): Promise<Article[]> {
-    const designationName = designation.toString();
-
+    // iOS mangles query strings that mix raw brackets with percent-encoded
+    // ones (see strapiUrlEncoding.spec.ts) — always go through
+    // URLSearchParams so every bracket is encoded.
+    const searchParams = new URLSearchParams({
+      'filters[Designation]': designation.toString(),
+    });
     const { data } = await this.get(
-      `/api/articles/?filters[Designation]=${encodeURI(
-        designationName
-      )}&${populateSearchParams}`
+      `/api/articles/?${searchParams}&${populateSearchParams}`
     );
     const promises = (data as StrapiArticleData[]).map((d) =>
       this.getDefaultThumbnailAndMakeArticle(d)
@@ -133,8 +135,9 @@ class StrapiArticleRepository implements ArticleRepository {
   }
 
   async getMetadataById(id: ArticleId): Promise<ArticleMetadata> {
+    const searchParams = new URLSearchParams({ 'fields[0]': 'updatedAt' });
     const { data } = await this.getSingle<StrapiArticleMetadata>(
-      `/api/articles/${id}?fields[0]=updatedAt`
+      `/api/articles/${id}?${searchParams}`
     );
     return new ArticleMetadata(
       new ArticleId(data.id.toString()),
@@ -144,7 +147,7 @@ class StrapiArticleRepository implements ArticleRepository {
 
   async getAllMetadata(): Promise<ArticleMetadata[]> {
     const { data } = await this.getMultiple<StrapiArticleMetadata>(
-      '/api/articles?fields[0]=updatedAt'
+      `/api/articles?${new URLSearchParams({ 'fields[0]': 'updatedAt' })}`
     );
     return data.map(
       (d) =>

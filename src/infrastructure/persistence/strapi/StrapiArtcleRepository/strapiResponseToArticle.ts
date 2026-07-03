@@ -24,9 +24,11 @@ export const strapiResponseToArticle = (
   }
 
   let thumbnail = defaultThumbnail;
-  if (attributes.Thumbnail && attributes.Thumbnail?.data !== null) {
+  if (attributes.Thumbnail?.data) {
+    const img = attributes.Thumbnail.data.attributes;
+    // Small uploads/SVGs have no generated formats — fall back to the original.
     thumbnail = new Image(
-      strapiHostUrl + attributes.Thumbnail.data.attributes.formats.thumbnail.url
+      strapiHostUrl + (img.formats?.thumbnail?.url ?? img.url)
     );
   }
 

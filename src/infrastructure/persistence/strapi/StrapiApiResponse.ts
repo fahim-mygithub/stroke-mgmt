@@ -105,12 +105,14 @@ export type StrapiImage = {
     caption: null;
     width: number;
     height: number;
+    // Strapi only generates formats for uploads larger than the format
+    // size; small images/SVGs come back with `formats: null`.
     formats: {
-      thumbnail: StrapiImageFormat;
-      large: StrapiImageFormat;
-      small: StrapiImageFormat;
-      medium: StrapiImageFormat;
-    };
+      thumbnail?: StrapiImageFormat;
+      large?: StrapiImageFormat;
+      small?: StrapiImageFormat;
+      medium?: StrapiImageFormat;
+    } | null;
     hash: string;
     ext: string;
     mime: string;
