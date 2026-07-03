@@ -9,6 +9,14 @@ name: iOS sideload build
 
 on:
   workflow_dispatch:
+  # workflow_dispatch only works once the workflow exists on the default
+  # branch; until then, touching this file (e.g. bumping the comment below)
+  # and pushing re-triggers a build on this branch.
+  push:
+    branches: [app-store-readiness-blockers]
+    paths: ['.github/workflows/ios-sideload-build.yml']
+
+# build-trigger: 1
 
 jobs:
   build-ipa:
