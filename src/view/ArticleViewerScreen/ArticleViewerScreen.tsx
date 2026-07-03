@@ -30,7 +30,11 @@ function factory(renderArticleByIdAction: RenderArticleByIdAction) {
       () =>
         new WebViewEventHandler({
           articlelinkpressed: ({ articleId }) => {
-            navigation.navigate('ArticleViewerScreen', {
+            // push, not navigate: navigate() to the route we're already on
+            // just swaps params, so back would skip the linking article and
+            // land on the home screen. Pushing keeps the previous article
+            // mounted (scroll position intact) and back returns to it.
+            navigation.push('ArticleViewerScreen', {
               id: new ArticleId(articleId),
             });
           },
