@@ -1,0 +1,71 @@
+# Builds an UNSIGNED iOS IPA for sideloading (Sideloadly, AltStore, etc.).
+# No Apple Developer account or signing certificates are needed here — the
+# sideloading tool re-signs the IPA with the tester's own Apple ID.
+#
+# Trigger manually: Actions tab → "iOS sideload build" → Run workflow,
+# or `gh workflow run ios-sideload-build.yml --ref <branch>`.
+# The IPA is uploaded as a workflow artifact.
+name: iOS sideload build
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build-ipa:
+    runs-on: macos-15
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: yarn
+
+      - name: Install JS dependencies
+        run: yarn install --frozen-lockfile
+        env:
+          EXPO_NO_TELEMETRY: '1'
+
+      - name: Generate native iOS project (expo prebuild)
+        run: npx expo prebuild --platform ios --no-install
+        env:
+          EXPO_NO_TELEMETRY: '1'
+          # Leave NODE_ENV unset/production so extra.NODE_ENV routes the app
+          # at the live CMS, matching a store build.
+
+      - name: Install CocoaPods
+        run: pod install --project-directory=ios
+
+      - name: Build unsigned archive
+        run: |
+          set -o pipefail
+          WORKSPACE=$(ls ios/*.xcworkspace | head -1)
+          SCHEME=$(basename "$WORKSPACE" .xcworkspace)
+          echo "Building scheme '$SCHEME' from '$WORKSPACE'"
+          xcodebuild \
+            -workspace "$WORKSPACE" \
+            -scheme "$SCHEME" \
+            -configuration Release \
+            -destination 'generic/platform=iOS' \
+            -archivePath build/app.xcarchive \
+            archive \
+            CODE_SIGNING_ALLOWED=NO \
+            CODE_SIGNING_REQUIRED=NO \
+            CODE_SIGN_IDENTITY="" \
+            | xcbeautify --renderer github-actions
+
+      - name: Package IPA
+        run: |
+          VERSION=$(node -p "require('./app.config.js').expo.version")
+          mkdir -p build/Payload
+          cp -R build/app.xcarchive/Products/Applications/*.app build/Payload/
+          (cd build && zip -qry "IschemicStroke-${VERSION}-unsigned.ipa" Payload)
+          ls -lh build/*.ipa
+
+      - name: Upload IPA artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ios-sideload-ipa
+          path: build/*.ipa
+          retention-days: 30
