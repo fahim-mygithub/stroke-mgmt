@@ -28,8 +28,21 @@ function HtmlWebView({
 }: Props) {
   return (
     <WebView
-      source={{ html }}
+      // baseUrl gives the document a real https origin. Without it the page
+      // has a null origin and sends no Referer, and YouTube's embedder
+      // identity check (enforced July 2025) rejects playback with
+      // "Error 153 – Video player configuration error". All page resources
+      // are inline or data:/absolute-https URIs, so nothing resolves against
+      // the base.
+      source={{ html, baseUrl: 'https://stroke-mgmt-cms.a2hosted.com' }}
       originWhitelist={['*']}
+      // Play YouTube embeds inside the article instead of forcing the iOS
+      // fullscreen native player; the gesture requirement must be off for the
+      // embedded player to initialize its playback config (embeds never
+      // carry autoplay, so nothing plays unprompted).
+      allowsInlineMediaPlayback
+      allowsFullscreenVideo
+      mediaPlaybackRequiresUserAction={false}
       style={style}
       scrollEnabled={scrollEnabled}
       textInteractionEnabled={textInteractionEnabled}
