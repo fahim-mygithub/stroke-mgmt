@@ -75,13 +75,13 @@ module.exports = {
     },
     extra: {
       eas: {
-        projectId: '935f864e-12bb-456a-8214-8070b8ba5baa',
+        projectId: '658990ea-c851-4b61-96a2-1f12bae6653b',
       },
       NODE_ENV: process.env.NODE_ENV,
     },
     updates: {
       fallbackToCacheTimeout: 0,
-      url: 'https://u.expo.dev/935f864e-12bb-456a-8214-8070b8ba5baa',
+      url: 'https://u.expo.dev/658990ea-c851-4b61-96a2-1f12bae6653b',
     },
     runtimeVersion: {
       policy: 'appVersion',
