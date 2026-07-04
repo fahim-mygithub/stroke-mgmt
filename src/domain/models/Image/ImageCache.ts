@@ -11,10 +11,21 @@ class ImageCache {
 
   static $inject = ['imageStore', 'cachedImageMetadataRepository'];
 
-  async saveImage(url: string) {
-    // warning: may save repeats of same file with different names without deleting
-    const metadata = await this.imageStore.saveFileFromUrl(url);
-    return this.cachedImageMetadataRepository.save(metadata);
+  private inFlightSaves = new Map<string, Promise<void>>();
+
+  async saveImage(url: string): Promise<void> {
+    // Concurrent saves of the same url (cache sync fires one per article, and
+    // many share a placeholder image) would each download the bytes and write
+    // an orphaned uuid-named file — only the last metadata row wins. Share one
+    // in-flight promise per url instead.
+    const inFlight = this.inFlightSaves.get(url);
+    if (inFlight) return inFlight;
+    const save = (async () => {
+      const metadata = await this.imageStore.saveFileFromUrl(url);
+      await this.cachedImageMetadataRepository.save(metadata);
+    })().finally(() => this.inFlightSaves.delete(url));
+    this.inFlightSaves.set(url, save);
+    return save;
   }
 
   // added specifically because expo cached article repo needs to get base64 images.

@@ -5,6 +5,7 @@ import { Image } from '@/domain/models/Image';
 import { Tag } from '@/domain/models/Tag';
 import { sanitizeCmsHtml } from '@/infrastructure/html-processing/sanitize/sanitizeCmsHtml';
 import type { StrapiArticleData } from '@/infrastructure/persistence/strapi/StrapiApiResponse';
+import { pickThumbnailFormatUrl } from '@/infrastructure/persistence/strapi/pickThumbnailFormatUrl';
 
 export const strapiResponseToArticle = (
   defaultThumbnail: Image,
@@ -26,10 +27,7 @@ export const strapiResponseToArticle = (
   let thumbnail = defaultThumbnail;
   if (attributes.Thumbnail?.data) {
     const img = attributes.Thumbnail.data.attributes;
-    // Small uploads/SVGs have no generated formats — fall back to the original.
-    thumbnail = new Image(
-      strapiHostUrl + (img.formats?.thumbnail?.url ?? img.url)
-    );
+    thumbnail = new Image(strapiHostUrl + pickThumbnailFormatUrl(img));
   }
 
   return new Article({

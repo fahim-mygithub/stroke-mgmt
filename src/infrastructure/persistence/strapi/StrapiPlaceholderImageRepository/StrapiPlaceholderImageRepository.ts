@@ -5,6 +5,7 @@ import type {
   StrapiPlaceholderImageData,
 } from '@/infrastructure/persistence/strapi/StrapiApiResponse';
 import { StrapiApiError } from '@/infrastructure/persistence/strapi/StrapiApiError';
+import { pickThumbnailFormatUrl } from '@/infrastructure/persistence/strapi/pickThumbnailFormatUrl';
 import type { ImageRepository } from '@/domain/models/Image';
 import { Image } from '@/domain/models/Image';
 
@@ -40,12 +41,8 @@ class StrapiPlaceholderImageRepository implements ImageRepository {
     const response = await this.fetchData();
     const data = response.data as StrapiPlaceholderImageData;
     return data.attributes.Images.data.map(
-      // Small uploads/SVGs have no generated formats — fall back to the original.
       (i) =>
-        new Image(
-          this.strapiHostUrl +
-            (i.attributes.formats?.thumbnail?.url ?? i.attributes.url)
-        )
+        new Image(this.strapiHostUrl + pickThumbnailFormatUrl(i.attributes))
     );
   }
 

@@ -22,8 +22,15 @@ class UpdateService {
   ];
 
   async performPostUpdateChangesIfNecessary(): Promise<void> {
-    if (!(await this.shouldPerformPostUpdateChanges())) return;
-    await this.performNecessaryPostUpdateChanges();
+    if (await this.shouldPerformPostUpdateChanges()) {
+      await this.performNecessaryPostUpdateChanges();
+      return;
+    }
+    // Persist even when nothing ran. A fresh install's first launch reports
+    // currentVersion via the empty-storage heuristic without writing it; by
+    // the second launch other keys exist, so a missing version key would be
+    // misread as a v1.0.0 upgrade and re-run every post-update change.
+    await this.versionRepository.update(this.currentVersion);
   }
 
   private async shouldPerformPostUpdateChanges() {

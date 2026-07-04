@@ -1,5 +1,4 @@
-import React, { useCallback, useState } from 'react';
-import type { LayoutChangeEvent } from 'react-native';
+import React, { useCallback } from 'react';
 import { View, StyleSheet, useWindowDimensions } from 'react-native';
 import type { AppNavigationProps } from '@/view/Router';
 import type { RenderAlgorithmByIdAction } from '@/application/RenderAlgorithmByIdAction';
@@ -19,12 +18,6 @@ function factory(
     const { id } = route.params;
 
     const { width } = useWindowDimensions();
-    const [height, setHeight] = useState(0);
-
-    const handleLayout = useCallback(
-      (e: LayoutChangeEvent) => setHeight(e.nativeEvent.layout.height - 20),
-      []
-    );
 
     const onPressArticleLink = useCallback(
       (aid: ArticleId) => {
@@ -51,7 +44,7 @@ function factory(
     );
 
     return (
-      <View style={styles.container} onLayout={handleLayout}>
+      <View style={styles.container}>
         <AlgorithmCollectionView
           width={width}
           initialId={id}
@@ -63,7 +56,6 @@ function factory(
             (aId, cb) => renderAlgorithmByIdAction.execute(aId, cb),
             []
           )}
-          minHeight={height}
           onPressArticleLink={onPressArticleLink}
           onPressExternalLink={onPressExternalLink}
           onRecordStep={onRecordStep}

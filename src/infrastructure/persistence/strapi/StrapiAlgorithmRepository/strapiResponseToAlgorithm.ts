@@ -17,6 +17,7 @@ import { Citation } from '@/domain/models/Citation';
 import { Image } from '@/domain/models/Image';
 import { sanitizeCmsHtml } from '@/infrastructure/html-processing/sanitize/sanitizeCmsHtml';
 import type { StrapiAlgorithmData } from '@/infrastructure/persistence/strapi/StrapiApiResponse';
+import { pickThumbnailFormatUrl } from '@/infrastructure/persistence/strapi/pickThumbnailFormatUrl';
 
 export const strapiResponseToAlgorithm = (
   defaultThumbnail: Image,
@@ -67,10 +68,7 @@ export const strapiResponseToAlgorithm = (
   let thumbnail = defaultThumbnail;
   if (attributes.Thumbnail?.data) {
     const img = attributes.Thumbnail.data.attributes;
-    // Small uploads/SVGs have no generated formats — fall back to the original.
-    thumbnail = new Image(
-      strapiHostUrl + (img.formats?.thumbnail?.url ?? img.url)
-    );
+    thumbnail = new Image(strapiHostUrl + pickThumbnailFormatUrl(img));
   }
 
   const citations = citationData.map(
