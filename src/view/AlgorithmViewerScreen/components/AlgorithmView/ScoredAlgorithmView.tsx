@@ -1,5 +1,5 @@
-import React, { useCallback, useMemo, useState } from 'react';
-import { View } from 'react-native';
+import React, { useCallback, useMemo, useRef, useState } from 'react';
+import { Platform, View } from 'react-native';
 import {
   HtmlWebView,
   type HtmlWebViewMessageEvent,
@@ -39,6 +39,18 @@ function ScoredAlgorithmView({
 
   const [isBeforeLayout, setIsBeforeLayout] = useState(true);
 
+  // Android's WebView reports a short preliminary height on the first layout
+  // event and only grows to its final height once images/reflow settle (see
+  // partials/script.ejs: notify() fires immediately, then again on 'load').
+  // The one-shot scrollToEnd below lands against that short height, leaving a
+  // freshly-appended step below the fold so the user has to scroll by hand.
+  // Re-pin to the end as the height grows, but only during a brief window
+  // right after append so later user-driven changes (e.g. expanding an outcome
+  // dropdown) never yank the list. iOS/web report a stable height first, so
+  // they keep the original single-shot behaviour untouched.
+  const maxHeightRef = useRef(0);
+  const settleUntilRef = useRef(0);
+
   const eventHandler = useMemo(
     () =>
       new WebViewEventHandler({
@@ -46,6 +58,15 @@ function ScoredAlgorithmView({
           setHeight(h);
           if (isBeforeLayout) {
             setIsBeforeLayout(false);
+            maxHeightRef.current = h;
+            settleUntilRef.current = Date.now() + 2500;
+            onFirstLayout();
+          } else if (
+            Platform.OS === 'android' &&
+            h > maxHeightRef.current &&
+            Date.now() < settleUntilRef.current
+          ) {
+            maxHeightRef.current = h;
             onFirstLayout();
           }
         },
