@@ -6,12 +6,24 @@ import type { RootNavigationProps } from '@/view/Router/Router';
 import { useQueryClient } from '@tanstack/react-query';
 import type { ClearCacheAction } from '@/application/ClearCacheAction';
 import { useShowSnack } from '@/view/Snackbar/useShowSnack';
+import { goHome } from '@/view/Router/goHome';
+import { useTreatmentTrail } from '@/view/lib/TreatmentTrail';
 
 type Props = RootNavigationProps<'HeaderMenuModal'>;
 
 function factory(clearCacheAction: ClearCacheAction) {
   return function Menu({ navigation, route }: Props) {
     const { translateY } = route.params;
+
+    // This menu is a Root-stack modal, so it cannot navigate to HomeScreen
+    // directly — goHome dismisses it and aims the action at the nested App
+    // stack. The in-progress treatment trail goes with it, matching the
+    // summary screen's "Start over".
+    const { reset: resetTreatmentTrail } = useTreatmentTrail();
+    const handlePressHome = useCallback(
+      () => goHome(navigation, resetTreatmentTrail),
+      [navigation, resetTreatmentTrail]
+    );
 
     const handlePressDisclaimer = useCallback(() => {
       navigation.replace('DisclaimerModal');
@@ -72,6 +84,7 @@ function factory(clearCacheAction: ClearCacheAction) {
         </TouchableWithoutFeedback>
         <View style={[styles.menu, { transform: [{ translateY }] }]}>
           <View style={styles.content}>
+            <MenuItem onPress={handlePressHome}>Home</MenuItem>
             <MenuItem onPress={handlePressIntro}>Intro</MenuItem>
             <MenuItem onPress={handlePressDisclaimer}>Disclaimer</MenuItem>
             <MenuItem onPress={handlePressLicense}>License</MenuItem>

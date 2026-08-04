@@ -12,6 +12,8 @@ import {
   HowToOpenMenuBanner,
 } from '@/view/HowToOpenMenuBanner';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { goHome } from '@/view/Router/goHome';
+import { useTreatmentTrail } from '@/view/lib/TreatmentTrail';
 
 type Props = StackHeaderProps;
 
@@ -29,6 +31,17 @@ function Header({ navigation, route, options, back }: Props) {
   }, [navigation, statusBarHeight]);
 
   const handleBack = useCallback(() => navigation.goBack(), [navigation]);
+
+  // Cross-article links push a new screen each hop, so a reader several
+  // articles deep otherwise has to walk the whole stack back by hand. Going
+  // home unmounts the algorithm viewer, which destroys the in-progress step
+  // chain, so the recorded trail is discarded with it rather than being left to
+  // prefix a later, different pathway's summary.
+  const { reset: resetTreatmentTrail } = useTreatmentTrail();
+  const handleHome = useCallback(
+    () => goHome(navigation, resetTreatmentTrail),
+    [navigation, resetTreatmentTrail]
+  );
 
   const handleSearchPress = useCallback(() => {
     navigation.navigate('SearchModal');
@@ -58,11 +71,21 @@ function Header({ navigation, route, options, back }: Props) {
       <View style={styles.header}>
         <View style={styles.leading}>
           {back ? (
-            <IconButton
-              iconName="arrow-left"
-              onPress={handleBack}
-              style={styles.backButton}
-            />
+            <>
+              <IconButton
+                iconName="arrow-left"
+                onPress={handleBack}
+                style={styles.backButton}
+                accessibilityLabel="Go back"
+              />
+              {/* Sits beside the arrow the thumb is already travelling to, in
+                  space the empty route title never used. */}
+              <IconButton
+                iconName="home"
+                onPress={handleHome}
+                accessibilityLabel="Go to home screen"
+              />
+            </>
           ) : (
             <Text style={styles.brand} numberOfLines={1}>
               Ischemic Stroke
@@ -82,6 +105,7 @@ function Header({ navigation, route, options, back }: Props) {
             iconName="search"
             onPress={handleSearchPress}
             iconStyle={styles.trailingIcon}
+            accessibilityLabel="Search the reference library"
           />
           <IconButton
             variant="boxed"
@@ -89,6 +113,7 @@ function Header({ navigation, route, options, back }: Props) {
             onPress={handleMenuPress}
             iconStyle={styles.trailingIcon}
             style={styles.trailingIconSpacing}
+            accessibilityLabel="Open menu"
           />
         </View>
       </View>

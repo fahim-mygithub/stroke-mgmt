@@ -13,6 +13,8 @@ type IconButtonProps = {
   // 'bare' keeps the original 48px touch target (default, used app-wide);
   // 'boxed' is the redesign's 36px bordered square (top-bar search/kebab).
   variant?: 'bare' | 'boxed';
+  // An icon-only control is unlabelled to a screen reader without this.
+  accessibilityLabel?: string;
 };
 
 function IconButton({
@@ -22,6 +24,7 @@ function IconButton({
   iconStyle = {},
   disabled = false,
   variant = 'bare',
+  accessibilityLabel = undefined,
 }: IconButtonProps) {
   return (
     <TouchableOpacity
@@ -31,6 +34,8 @@ function IconButton({
         style,
       ]}
       disabled={disabled}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
     >
       <FontAwesome5
         name={iconName}

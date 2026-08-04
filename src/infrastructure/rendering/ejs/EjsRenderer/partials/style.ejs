@@ -1,6 +1,10 @@
 <style>
   body {
     margin: 0 16px;
+    /* CMS authors paste bare URLs as link text (a 118-char Medtronic link in
+       the Solitaire procedure demo), and an unbreakable token overflows the
+       page. Only breaks words that do not fit. */
+    overflow-wrap: break-word;
     padding: 0;
     font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
     background-color: transparent;
@@ -14,12 +18,20 @@
     color: #1E4E8C;
   }
 
-  iframe,
-  img {
+  iframe {
     width: 100%;
+    max-width: 100%;
   }
 
+  /* A cap, not a used width. `width: 100%` upscaled small images past their
+     intrinsic size (a 575px asset rendered 830px on a tablet) and was ignored
+     in every intrinsic-sizing context — table cells, the flex switch labels,
+     and the shrink-to-fit tooltip — where a wide image escaped the page.
+     `height: auto` also neutralises the `height` attribute that
+     sanitizeCmsHtml allows through, which would otherwise distort the ratio. */
   img {
+    max-width: 100%;
+    height: auto;
     border-radius: 10px;
   }
 
@@ -168,6 +180,18 @@
     padding-top: 8px;
     user-select: none;
     position: relative;
+    /* Flex items default to min-width:auto, so a replaced child's intrinsic
+       width would push the row past the viewport instead of shrinking. */
+    min-width: 0;
+  }
+
+  /* NOT the group label: flooring it at min-content is what keeps a long
+     single-word label (Thrombocytopenia, Hyperlipidaemia) from being sliced by
+     the level chips, which paint over it. An image in a label is already
+     contained by img{max-width:100%}, which transfers into the automatic
+     minimum size on its own. */
+  .template.switches__radiogroup {
+    min-width: 0;
   }
 
   .template.switches__list-item:first-child {
@@ -178,6 +202,13 @@
     display: none;
     position: absolute;
     top: 100%;
+    /* Absolutely positioned, so shrink-to-fit: without a cap a wide replaced
+       child sets the width from its intrinsic size and overflows the page.
+       The tooltip is also outside the flow, so it never contributes to
+       body.offsetHeight and can never be measured — keep it text-sized. */
+    left: 0;
+    max-width: 100%;
+    box-sizing: border-box;
     background-color: #0B1220;
     color: #FFFFFF;
     padding: 8px 12px;

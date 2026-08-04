@@ -81,6 +81,122 @@ describe('EjsAlgorithmRenderer', () => {
       expect(html).toContain('__finish__:1');
     });
 
+    // The generated CSS is snapshotted, but a snapshot only reports that it
+    // changed — it cannot say the image rule is still correct. These assert it.
+    describe('image sizing rules', () => {
+      const collapse = (css: string) => css.replace(/\s+/g, ' ');
+
+      it.each([
+        ['text algorithm', '0'],
+        ['scored algorithm', '1'],
+      ])('caps images instead of stretching them (%s)', async (_name, id) => {
+        const algorithm = await repo.getById(new AlgorithmId(id));
+        const renderer = new EjsRenderer(fs);
+        const css = collapse(await renderer.renderAlgorithm(algorithm));
+
+        expect(css).toContain('img { max-width: 100%; height: auto;');
+        // `width: 100%` upscales a small image past its intrinsic size and
+        // is defeated in every intrinsic-sizing context (table cells, flex
+        // labels, the absolutely-positioned tooltip).
+        expect(css).not.toMatch(/img\s*\{[^}]*[^-]width:\s*100%/);
+      });
+
+      it('keeps iframes filling the column', async () => {
+        const algorithm = await repo.getById(new AlgorithmId('0'));
+        const renderer = new EjsRenderer(fs);
+        const css = collapse(await renderer.renderAlgorithm(algorithm));
+
+        expect(css).toContain('iframe { width: 100%; max-width: 100%; }');
+      });
+
+      it('bounds the switch tooltip so a wide child cannot escape the page', async () => {
+        const algorithm = await repo.getById(new AlgorithmId('1'));
+        const renderer = new EjsRenderer(fs);
+        const css = collapse(await renderer.renderAlgorithm(algorithm));
+
+        // The tooltip is position:absolute, so it is shrink-to-fit and would
+        // otherwise take a replaced child's full intrinsic width.
+        expect(css).toMatch(
+          /\.template\.switches__tooltip \{[^}]*max-width: 100%/
+        );
+        expect(css).toMatch(
+          /\.template\.switches__tooltip \{[^}]*box-sizing: border-box/
+        );
+      });
+
+      it('never floors the switch label below its min-content width', async () => {
+        // The label and the level chips are the two flex items of a
+        // space-between row, so they sit edge to edge with no gap to absorb
+        // overflow — and the chips paint after the label, over it. Allowing the
+        // label to shrink past its text slices long single-word labels
+        // ("Thrombocytopenia") behind the first chip. Measured: 15.8px of the
+        // word hidden at 360dp, 45.7px at 320dp with five levels.
+        const algorithm = await repo.getById(new AlgorithmId('1'));
+        const renderer = new EjsRenderer(fs);
+        const css = collapse(await renderer.renderAlgorithm(algorithm));
+
+        expect(css).not.toMatch(
+          /\.template\.switches__group-label[^{]*\{[^}]*min-width: 0/
+        );
+      });
+
+      it('never uses a const loop counter in any template', async () => {
+        // `for (const i = 0; i < n; i++)` throws on the first increment, and it
+        // sits in the iframe-wrapping block — so on any document with a video
+        // embed every IIFE after it silently never runs. In article.ejs that
+        // killed the table wrapper: a procedure-demo article with a video AND a
+        // table overflowed the page by 268px at 376 CSS px, measured.
+        // Each template carries its own copy of this script.
+        const algorithm = await repo.getById(new AlgorithmId('0'));
+        const article = new Article({
+          summary: 'My Summary',
+          thumbnail: new Image('/img.png'),
+          id: new ArticleId('3'),
+          title: 'hello world',
+          html: '<p>body</p>',
+          designation: Designation.ARTICLE,
+          shouldShowOnHomeScreen: true,
+          lastUpdated: new Date(0),
+          citations: [],
+        });
+        const renderer = new EjsRenderer(fs);
+
+        const documents = await Promise.all([
+          renderer.renderAlgorithm(algorithm),
+          renderer.renderArticle(article),
+          renderer.renderDisclaimer(article),
+        ]);
+
+        documents.forEach((html) => {
+          expect(html).not.toContain('for (const i = 0');
+          // The load listener has to go on the clone the wrapper inserts; the
+          // original is detached by then.
+          expect(html).toContain(
+            "wrappedFrame.querySelector('iframe').addEventListener('load'"
+          );
+        });
+      });
+
+      it('applies the same cap to articles', async () => {
+        const article = new Article({
+          summary: 'My Summary',
+          thumbnail: new Image('/img.png'),
+          id: new ArticleId('2'),
+          title: 'hello world',
+          html: '<p><img src="/wide.png" alt=""></p>',
+          designation: Designation.ARTICLE,
+          shouldShowOnHomeScreen: true,
+          lastUpdated: new Date(0),
+          citations: [],
+        });
+
+        const renderer = new EjsRenderer(fs);
+        const css = collapse(await renderer.renderArticle(article));
+
+        expect(css).toContain('img { max-width: 100%; height: auto;');
+      });
+    });
+
     it('should render article title and html', async () => {
       const article = new Article({
         summary: 'My Summary',

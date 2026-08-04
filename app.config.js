@@ -2,7 +2,7 @@ module.exports = {
   expo: {
     name: 'Ischemic Stroke',
     slug: 'stroke-mgmt',
-    version: '1.1.3',
+    version: '1.1.4',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
     jsEngine: 'hermes',
@@ -56,9 +56,10 @@ module.exports = {
         backgroundColor: '#000000',
       },
       package: 'com.strokemgmtapp.strokemgmt',
-      // 3 was used on the abandoned release/ich branch (Aug 2024) and may have
-      // been uploaded to Play Console — skip it to avoid a rejected upload.
-      versionCode: 4,
+      // 3 shipped to Play (still live as of Aug 2026). 4 was built for the
+      // 1.1.3 release that was never uploaded, so it may or may not be
+      // consumed — 5 is unambiguously free.
+      versionCode: 5,
     },
     androidNavigationBar: {
       barStyle: 'dark-content',

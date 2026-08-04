@@ -11,6 +11,10 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
   <title>hello world</title>
   <style>
     body {
+      /* CMS authors paste bare URLs as link text (a 118-char Medtronic link in
+         the Solitaire procedure demo), and an unbreakable token overflows the
+         page. Only breaks words that do not fit. */
+      overflow-wrap: break-word;
       font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
       background-color: transparent;
       color: #0B1220;
@@ -23,12 +27,15 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
       color: #1E4E8C;
     }
 
-    iframe,
-    img {
+    iframe {
       width: 100%;
+      max-width: 100%;
     }
 
+    /* Cap, don't stretch — see the note in partials/style.ejs. */
     img {
+      max-width: 100%;
+      height: auto;
       border-radius: 10px;
     }
 
@@ -289,11 +296,15 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
       el.replaceWith(wrapper)
       return wrapper
     }
-    const frames = document.getElementsByTagName('iframe')
+    // Snapshot the live HTMLCollection before mutating it: wrapElement replaces
+    // each iframe, which would otherwise shift the collection mid-loop. The
+    // load listener must go on the CLONE inside the wrapper, since the original
+    // has already been detached.
+    const frames = Array.from(document.getElementsByTagName('iframe'))
     const wrappedFrames = []
-    for (const i = 0; i < frames.length; i++) {
+    for (let i = 0; i < frames.length; i++) {
       const wrappedFrame = wrapElement(frames[i], 'iframe__wrapper iframe__wrapper--loading')
-      frames[i].addEventListener('load', function() {
+      wrappedFrame.querySelector('iframe').addEventListener('load', function() {
         wrappedFrame.classList.remove('iframe__wrapper--loading')
       })
       wrappedFrames.push(wrappedFrame)
@@ -303,7 +314,7 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
       return {
         toOnline: function() {},
         toOffline: function() {
-          for (const i = 0; i < wrappedFrames.length; i++) {
+          for (let i = 0; i < wrappedFrames.length; i++) {
             const wrappedFrame = wrappedFrames[i]
             wrappedFrame.classList.add('iframe__wrapper--offline')
           }
@@ -315,7 +326,7 @@ exports[`EjsAlgorithmRenderer Behavior should render article title and html 1`] 
     function OfflineState(context) {
       return {
         toOnline: function() {
-          for (const i = 0; i < wrappedFrames.length; i++) {
+          for (let i = 0; i < wrappedFrames.length; i++) {
             const wrappedFrame = wrappedFrames[i]
             wrappedFrame.classList.remove('iframe__wrapper--offline')
           }
@@ -378,6 +389,10 @@ exports[`EjsAlgorithmRenderer Behavior should render disclaimer html 1`] = `
   <title>hello world</title>
   <style>
     body {
+      /* CMS authors paste bare URLs as link text (a 118-char Medtronic link in
+         the Solitaire procedure demo), and an unbreakable token overflows the
+         page. Only breaks words that do not fit. */
+      overflow-wrap: break-word;
       background-color: transparent;
       color: #0B1220;
       font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
@@ -425,12 +440,15 @@ exports[`EjsAlgorithmRenderer Behavior should render disclaimer html 1`] = `
       padding-left: 22px;
     }
 
-    iframe,
-    img {
+    iframe {
       width: 100%;
+      max-width: 100%;
     }
 
+    /* Cap, don't stretch — see the note in partials/style.ejs. */
     img {
+      max-width: 100%;
+      height: auto;
       border-radius: 10px;
     }
 
@@ -525,11 +543,15 @@ exports[`EjsAlgorithmRenderer Behavior should render disclaimer html 1`] = `
         el.replaceWith(wrapper)
         return wrapper
       }
-      const frames = document.getElementsByTagName('iframe')
+      // Snapshot the live HTMLCollection before mutating it: wrapElement replaces
+      // each iframe, which would otherwise shift the collection mid-loop. The
+      // load listener must go on the CLONE inside the wrapper, since the
+      // original has already been detached.
+      const frames = Array.from(document.getElementsByTagName('iframe'))
       const wrappedFrames = []
-      for (const i = 0; i < frames.length; i++) {
+      for (let i = 0; i < frames.length; i++) {
         const wrappedFrame = wrapElement(frames[i], 'iframe__wrapper iframe__wrapper--loading')
-        frames[i].addEventListener('load', function() {
+        wrappedFrame.querySelector('iframe').addEventListener('load', function() {
           wrappedFrame.classList.remove('iframe__wrapper--loading')
         })
         wrappedFrames.push(wrappedFrame)
@@ -539,7 +561,7 @@ exports[`EjsAlgorithmRenderer Behavior should render disclaimer html 1`] = `
         return {
           toOnline: function() {},
           toOffline: function() {
-            for (const i = 0; i < wrappedFrames.length; i++) {
+            for (let i = 0; i < wrappedFrames.length; i++) {
               const wrappedFrame = wrappedFrames[i]
               wrappedFrame.classList.add('iframe__wrapper--offline')
             }
@@ -551,7 +573,7 @@ exports[`EjsAlgorithmRenderer Behavior should render disclaimer html 1`] = `
       function OfflineState(context) {
         return {
           toOnline: function() {
-            for (const i = 0; i < wrappedFrames.length; i++) {
+            for (let i = 0; i < wrappedFrames.length; i++) {
               const wrappedFrame = wrappedFrames[i]
               wrappedFrame.classList.remove('iframe__wrapper--offline')
             }
@@ -603,6 +625,10 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
   <style>
   body {
     margin: 0 16px;
+    /* CMS authors paste bare URLs as link text (a 118-char Medtronic link in
+       the Solitaire procedure demo), and an unbreakable token overflows the
+       page. Only breaks words that do not fit. */
+    overflow-wrap: break-word;
     padding: 0;
     font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
     background-color: transparent;
@@ -616,12 +642,20 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
     color: #1E4E8C;
   }
 
-  iframe,
-  img {
+  iframe {
     width: 100%;
+    max-width: 100%;
   }
 
+  /* A cap, not a used width. \`width: 100%\` upscaled small images past their
+     intrinsic size (a 575px asset rendered 830px on a tablet) and was ignored
+     in every intrinsic-sizing context — table cells, the flex switch labels,
+     and the shrink-to-fit tooltip — where a wide image escaped the page.
+     \`height: auto\` also neutralises the \`height\` attribute that
+     sanitizeCmsHtml allows through, which would otherwise distort the ratio. */
   img {
+    max-width: 100%;
+    height: auto;
     border-radius: 10px;
   }
 
@@ -770,6 +804,18 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
     padding-top: 8px;
     user-select: none;
     position: relative;
+    /* Flex items default to min-width:auto, so a replaced child's intrinsic
+       width would push the row past the viewport instead of shrinking. */
+    min-width: 0;
+  }
+
+  /* NOT the group label: flooring it at min-content is what keeps a long
+     single-word label (Thrombocytopenia, Hyperlipidaemia) from being sliced by
+     the level chips, which paint over it. An image in a label is already
+     contained by img{max-width:100%}, which transfers into the automatic
+     minimum size on its own. */
+  .template.switches__radiogroup {
+    min-width: 0;
   }
 
   .template.switches__list-item:first-child {
@@ -780,6 +826,13 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
     display: none;
     position: absolute;
     top: 100%;
+    /* Absolutely positioned, so shrink-to-fit: without a cap a wide replaced
+       child sets the width from its intrinsic size and overflows the page.
+       The tooltip is also outside the flow, so it never contributes to
+       body.offsetHeight and can never be measured — keep it text-sized. */
+    left: 0;
+    max-width: 100%;
+    box-sizing: border-box;
     background-color: #0B1220;
     color: #FFFFFF;
     padding: 8px 12px;
@@ -1184,17 +1237,74 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
 
   ; // Report window height
   (function() {
-    const notify = () => notifyLayout({
-      width: document.body.offsetWidth,
-      height: document.body.offsetHeight,
-    });
+    // The native container is a fixed-height box with scrolling disabled, so
+    // anything taller than the last height reported here is clipped outright.
+    // CMS images arrive as bare <img src alt> with no dimensions, which means
+    // they occupy zero height until their bytes land — every measurement taken
+    // before then is short by the image's full rendered height.
+    let lastHeight = -1;
+
+    const notify = () => {
+      lastHeight = document.body.offsetHeight;
+      notifyLayout({
+        width: document.body.offsetWidth,
+        height: lastHeight,
+      });
+    };
+
+    // Each message re-renders the native view, and the observers below fire on
+    // every reflow, so only an actual change is worth crossing the bridge for.
+    const notifyIfChanged = () => {
+      if (document.body.offsetHeight === lastHeight) return;
+      notify();
+    };
+
+    // Coalesce a burst of reflows (several images completing together) into one
+    // measurement taken after layout has settled.
+    let scheduled = false;
+    const scheduleNotify = () => {
+      if (scheduled) return;
+      scheduled = true;
+      const run = () => {
+        scheduled = false;
+        notifyIfChanged();
+      };
+      if (typeof requestAnimationFrame === 'function') requestAnimationFrame(run);
+      else setTimeout(run, 16);
+    };
+
+    // Re-measure as each image resolves. Waiting only for window 'load' leaves
+    // the view clipped for as long as the slowest image is in flight, and an
+    // image revealed later (an expanded outcome on a cold cache) is not covered
+    // by 'load' at all. Tracked in a WeakSet rather than a data attribute: the
+    // table wrapper below deep-clones its tables, and a marker attribute would
+    // be copied onto the clone and make it look already-watched.
+    const watched = new WeakSet();
+    const watchImage = (img) => {
+      if (watched.has(img)) return;
+      watched.add(img);
+      if (img.complete) return;
+      img.addEventListener('load', scheduleNotify);
+      img.addEventListener('error', scheduleNotify);
+    };
+    const watchImagesIn = (node) => {
+      if (!node || node.nodeType !== 1) return;
+      if (node.tagName === 'IMG') watchImage(node);
+      Array.prototype.forEach.call(node.querySelectorAll('img'), watchImage);
+    };
 
     // Watch for opening of outcome dropdowns
     const bodyEl = document.querySelector('body')
     const observerCb = (mutationList) => {
       mutationList.forEach(mut => {
+        if (mut.type === 'childList') {
+          // The table and iframe wrappers replace nodes after this runs, so
+          // images can arrive detached from the ones scanned at startup.
+          Array.prototype.forEach.call(mut.addedNodes, watchImagesIn);
+          return;
+        }
         if (mut.type !== 'attributes') return;
-        if (mut.attributeName === 'open') notify();
+        if (mut.attributeName === 'open') scheduleNotify();
       })
     }
     const observer = new MutationObserver(observerCb)
@@ -1204,11 +1314,19 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
       subtree: true
     })
 
+    watchImagesIn(bodyEl);
+
+    // Catch-all for growth no event above accounts for: web fonts swapping in,
+    // a table wrapper gaining a scrollbar gutter, content injected later.
+    if (typeof ResizeObserver === 'function') {
+      new ResizeObserver(scheduleNotify).observe(bodyEl);
+    }
+
     // In case of window resizing
-    window.addEventListener('resize', notify)
+    window.addEventListener('resize', scheduleNotify)
 
     // Wait for any images to finish loading
-    window.addEventListener('load', notify)
+    window.addEventListener('load', scheduleNotify)
     notify()
   })();
 
@@ -1322,11 +1440,13 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
       el.replaceWith(wrapper)
       return wrapper
     }
-    const frames = document.getElementsByTagName('iframe')
+    // Snapshot the live HTMLCollection before mutating it: wrapElement replaces
+    // each iframe, which would otherwise shift the collection mid-loop.
+    const frames = Array.from(document.getElementsByTagName('iframe'))
     const wrappedFrames = []
-    for (const i = 0; i < frames.length; i++) {
+    for (let i = 0; i < frames.length; i++) {
       const wrappedFrame = wrapElement(frames[i], 'iframe__wrapper iframe__wrapper--loading')
-      frames[i].addEventListener('load', function() {
+      wrappedFrame.querySelector('iframe').addEventListener('load', function() {
         wrappedFrame.classList.remove('iframe__wrapper--loading')
       })
       wrappedFrames.push(wrappedFrame)
@@ -1336,7 +1456,7 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
       return {
         toOnline: function() {},
         toOffline: function() {
-          for (const i = 0; i < wrappedFrames.length; i++) {
+          for (let i = 0; i < wrappedFrames.length; i++) {
             const wrappedFrame = wrappedFrames[i]
             wrappedFrame.classList.add('iframe__wrapper--offline')
           }
@@ -1348,7 +1468,7 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
     function OfflineState(context) {
       return {
         toOnline: function() {
-          for (const i = 0; i < wrappedFrames.length; i++) {
+          for (let i = 0; i < wrappedFrames.length; i++) {
             const wrappedFrame = wrappedFrames[i]
             wrappedFrame.classList.remove('iframe__wrapper--offline')
           }
@@ -1390,6 +1510,10 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
   <style>
   body {
     margin: 0 16px;
+    /* CMS authors paste bare URLs as link text (a 118-char Medtronic link in
+       the Solitaire procedure demo), and an unbreakable token overflows the
+       page. Only breaks words that do not fit. */
+    overflow-wrap: break-word;
     padding: 0;
     font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
     background-color: transparent;
@@ -1403,12 +1527,20 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
     color: #1E4E8C;
   }
 
-  iframe,
-  img {
+  iframe {
     width: 100%;
+    max-width: 100%;
   }
 
+  /* A cap, not a used width. \`width: 100%\` upscaled small images past their
+     intrinsic size (a 575px asset rendered 830px on a tablet) and was ignored
+     in every intrinsic-sizing context — table cells, the flex switch labels,
+     and the shrink-to-fit tooltip — where a wide image escaped the page.
+     \`height: auto\` also neutralises the \`height\` attribute that
+     sanitizeCmsHtml allows through, which would otherwise distort the ratio. */
   img {
+    max-width: 100%;
+    height: auto;
     border-radius: 10px;
   }
 
@@ -1557,6 +1689,18 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
     padding-top: 8px;
     user-select: none;
     position: relative;
+    /* Flex items default to min-width:auto, so a replaced child's intrinsic
+       width would push the row past the viewport instead of shrinking. */
+    min-width: 0;
+  }
+
+  /* NOT the group label: flooring it at min-content is what keeps a long
+     single-word label (Thrombocytopenia, Hyperlipidaemia) from being sliced by
+     the level chips, which paint over it. An image in a label is already
+     contained by img{max-width:100%}, which transfers into the automatic
+     minimum size on its own. */
+  .template.switches__radiogroup {
+    min-width: 0;
   }
 
   .template.switches__list-item:first-child {
@@ -1567,6 +1711,13 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
     display: none;
     position: absolute;
     top: 100%;
+    /* Absolutely positioned, so shrink-to-fit: without a cap a wide replaced
+       child sets the width from its intrinsic size and overflows the page.
+       The tooltip is also outside the flow, so it never contributes to
+       body.offsetHeight and can never be measured — keep it text-sized. */
+    left: 0;
+    max-width: 100%;
+    box-sizing: border-box;
     background-color: #0B1220;
     color: #FFFFFF;
     padding: 8px 12px;
@@ -1899,17 +2050,74 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
 
   ; // Report window height
   (function() {
-    const notify = () => notifyLayout({
-      width: document.body.offsetWidth,
-      height: document.body.offsetHeight,
-    });
+    // The native container is a fixed-height box with scrolling disabled, so
+    // anything taller than the last height reported here is clipped outright.
+    // CMS images arrive as bare <img src alt> with no dimensions, which means
+    // they occupy zero height until their bytes land — every measurement taken
+    // before then is short by the image's full rendered height.
+    let lastHeight = -1;
+
+    const notify = () => {
+      lastHeight = document.body.offsetHeight;
+      notifyLayout({
+        width: document.body.offsetWidth,
+        height: lastHeight,
+      });
+    };
+
+    // Each message re-renders the native view, and the observers below fire on
+    // every reflow, so only an actual change is worth crossing the bridge for.
+    const notifyIfChanged = () => {
+      if (document.body.offsetHeight === lastHeight) return;
+      notify();
+    };
+
+    // Coalesce a burst of reflows (several images completing together) into one
+    // measurement taken after layout has settled.
+    let scheduled = false;
+    const scheduleNotify = () => {
+      if (scheduled) return;
+      scheduled = true;
+      const run = () => {
+        scheduled = false;
+        notifyIfChanged();
+      };
+      if (typeof requestAnimationFrame === 'function') requestAnimationFrame(run);
+      else setTimeout(run, 16);
+    };
+
+    // Re-measure as each image resolves. Waiting only for window 'load' leaves
+    // the view clipped for as long as the slowest image is in flight, and an
+    // image revealed later (an expanded outcome on a cold cache) is not covered
+    // by 'load' at all. Tracked in a WeakSet rather than a data attribute: the
+    // table wrapper below deep-clones its tables, and a marker attribute would
+    // be copied onto the clone and make it look already-watched.
+    const watched = new WeakSet();
+    const watchImage = (img) => {
+      if (watched.has(img)) return;
+      watched.add(img);
+      if (img.complete) return;
+      img.addEventListener('load', scheduleNotify);
+      img.addEventListener('error', scheduleNotify);
+    };
+    const watchImagesIn = (node) => {
+      if (!node || node.nodeType !== 1) return;
+      if (node.tagName === 'IMG') watchImage(node);
+      Array.prototype.forEach.call(node.querySelectorAll('img'), watchImage);
+    };
 
     // Watch for opening of outcome dropdowns
     const bodyEl = document.querySelector('body')
     const observerCb = (mutationList) => {
       mutationList.forEach(mut => {
+        if (mut.type === 'childList') {
+          // The table and iframe wrappers replace nodes after this runs, so
+          // images can arrive detached from the ones scanned at startup.
+          Array.prototype.forEach.call(mut.addedNodes, watchImagesIn);
+          return;
+        }
         if (mut.type !== 'attributes') return;
-        if (mut.attributeName === 'open') notify();
+        if (mut.attributeName === 'open') scheduleNotify();
       })
     }
     const observer = new MutationObserver(observerCb)
@@ -1919,11 +2127,19 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
       subtree: true
     })
 
+    watchImagesIn(bodyEl);
+
+    // Catch-all for growth no event above accounts for: web fonts swapping in,
+    // a table wrapper gaining a scrollbar gutter, content injected later.
+    if (typeof ResizeObserver === 'function') {
+      new ResizeObserver(scheduleNotify).observe(bodyEl);
+    }
+
     // In case of window resizing
-    window.addEventListener('resize', notify)
+    window.addEventListener('resize', scheduleNotify)
 
     // Wait for any images to finish loading
-    window.addEventListener('load', notify)
+    window.addEventListener('load', scheduleNotify)
     notify()
   })();
 
@@ -2037,11 +2253,13 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
       el.replaceWith(wrapper)
       return wrapper
     }
-    const frames = document.getElementsByTagName('iframe')
+    // Snapshot the live HTMLCollection before mutating it: wrapElement replaces
+    // each iframe, which would otherwise shift the collection mid-loop.
+    const frames = Array.from(document.getElementsByTagName('iframe'))
     const wrappedFrames = []
-    for (const i = 0; i < frames.length; i++) {
+    for (let i = 0; i < frames.length; i++) {
       const wrappedFrame = wrapElement(frames[i], 'iframe__wrapper iframe__wrapper--loading')
-      frames[i].addEventListener('load', function() {
+      wrappedFrame.querySelector('iframe').addEventListener('load', function() {
         wrappedFrame.classList.remove('iframe__wrapper--loading')
       })
       wrappedFrames.push(wrappedFrame)
@@ -2051,7 +2269,7 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
       return {
         toOnline: function() {},
         toOffline: function() {
-          for (const i = 0; i < wrappedFrames.length; i++) {
+          for (let i = 0; i < wrappedFrames.length; i++) {
             const wrappedFrame = wrappedFrames[i]
             wrappedFrame.classList.add('iframe__wrapper--offline')
           }
@@ -2063,7 +2281,7 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
     function OfflineState(context) {
       return {
         toOnline: function() {
-          for (const i = 0; i < wrappedFrames.length; i++) {
+          for (let i = 0; i < wrappedFrames.length; i++) {
             const wrappedFrame = wrappedFrames[i]
             wrappedFrame.classList.remove('iframe__wrapper--offline')
           }

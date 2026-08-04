@@ -8,6 +8,10 @@
   <title><%- data.title %></title>
   <style>
     body {
+      /* CMS authors paste bare URLs as link text (a 118-char Medtronic link in
+         the Solitaire procedure demo), and an unbreakable token overflows the
+         page. Only breaks words that do not fit. */
+      overflow-wrap: break-word;
       font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
       background-color: transparent;
       color: #0B1220;
@@ -20,12 +24,15 @@
       color: #1E4E8C;
     }
 
-    iframe,
-    img {
+    iframe {
       width: 100%;
+      max-width: 100%;
     }
 
+    /* Cap, don't stretch — see the note in partials/style.ejs. */
     img {
+      max-width: 100%;
+      height: auto;
       border-radius: 10px;
     }
 
@@ -295,11 +302,15 @@
       el.replaceWith(wrapper)
       return wrapper
     }
-    const frames = document.getElementsByTagName('iframe')
+    // Snapshot the live HTMLCollection before mutating it: wrapElement replaces
+    // each iframe, which would otherwise shift the collection mid-loop. The
+    // load listener must go on the CLONE inside the wrapper, since the original
+    // has already been detached.
+    const frames = Array.from(document.getElementsByTagName('iframe'))
     const wrappedFrames = []
-    for (const i = 0; i < frames.length; i++) {
+    for (let i = 0; i < frames.length; i++) {
       const wrappedFrame = wrapElement(frames[i], 'iframe__wrapper iframe__wrapper--loading')
-      frames[i].addEventListener('load', function() {
+      wrappedFrame.querySelector('iframe').addEventListener('load', function() {
         wrappedFrame.classList.remove('iframe__wrapper--loading')
       })
       wrappedFrames.push(wrappedFrame)
@@ -309,7 +320,7 @@
       return {
         toOnline: function() {},
         toOffline: function() {
-          for (const i = 0; i < wrappedFrames.length; i++) {
+          for (let i = 0; i < wrappedFrames.length; i++) {
             const wrappedFrame = wrappedFrames[i]
             wrappedFrame.classList.add('iframe__wrapper--offline')
           }
@@ -321,7 +332,7 @@
     function OfflineState(context) {
       return {
         toOnline: function() {
-          for (const i = 0; i < wrappedFrames.length; i++) {
+          for (let i = 0; i < wrappedFrames.length; i++) {
             const wrappedFrame = wrappedFrames[i]
             wrappedFrame.classList.remove('iframe__wrapper--offline')
           }

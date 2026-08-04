@@ -20,17 +20,74 @@
 
   ; // Report window height
   (function() {
-    const notify = () => notifyLayout({
-      width: document.body.offsetWidth,
-      height: document.body.offsetHeight,
-    });
+    // The native container is a fixed-height box with scrolling disabled, so
+    // anything taller than the last height reported here is clipped outright.
+    // CMS images arrive as bare <img src alt> with no dimensions, which means
+    // they occupy zero height until their bytes land — every measurement taken
+    // before then is short by the image's full rendered height.
+    let lastHeight = -1;
+
+    const notify = () => {
+      lastHeight = document.body.offsetHeight;
+      notifyLayout({
+        width: document.body.offsetWidth,
+        height: lastHeight,
+      });
+    };
+
+    // Each message re-renders the native view, and the observers below fire on
+    // every reflow, so only an actual change is worth crossing the bridge for.
+    const notifyIfChanged = () => {
+      if (document.body.offsetHeight === lastHeight) return;
+      notify();
+    };
+
+    // Coalesce a burst of reflows (several images completing together) into one
+    // measurement taken after layout has settled.
+    let scheduled = false;
+    const scheduleNotify = () => {
+      if (scheduled) return;
+      scheduled = true;
+      const run = () => {
+        scheduled = false;
+        notifyIfChanged();
+      };
+      if (typeof requestAnimationFrame === 'function') requestAnimationFrame(run);
+      else setTimeout(run, 16);
+    };
+
+    // Re-measure as each image resolves. Waiting only for window 'load' leaves
+    // the view clipped for as long as the slowest image is in flight, and an
+    // image revealed later (an expanded outcome on a cold cache) is not covered
+    // by 'load' at all. Tracked in a WeakSet rather than a data attribute: the
+    // table wrapper below deep-clones its tables, and a marker attribute would
+    // be copied onto the clone and make it look already-watched.
+    const watched = new WeakSet();
+    const watchImage = (img) => {
+      if (watched.has(img)) return;
+      watched.add(img);
+      if (img.complete) return;
+      img.addEventListener('load', scheduleNotify);
+      img.addEventListener('error', scheduleNotify);
+    };
+    const watchImagesIn = (node) => {
+      if (!node || node.nodeType !== 1) return;
+      if (node.tagName === 'IMG') watchImage(node);
+      Array.prototype.forEach.call(node.querySelectorAll('img'), watchImage);
+    };
 
     // Watch for opening of outcome dropdowns
     const bodyEl = document.querySelector('body')
     const observerCb = (mutationList) => {
       mutationList.forEach(mut => {
+        if (mut.type === 'childList') {
+          // The table and iframe wrappers replace nodes after this runs, so
+          // images can arrive detached from the ones scanned at startup.
+          Array.prototype.forEach.call(mut.addedNodes, watchImagesIn);
+          return;
+        }
         if (mut.type !== 'attributes') return;
-        if (mut.attributeName === 'open') notify();
+        if (mut.attributeName === 'open') scheduleNotify();
       })
     }
     const observer = new MutationObserver(observerCb)
@@ -40,11 +97,19 @@
       subtree: true
     })
 
+    watchImagesIn(bodyEl);
+
+    // Catch-all for growth no event above accounts for: web fonts swapping in,
+    // a table wrapper gaining a scrollbar gutter, content injected later.
+    if (typeof ResizeObserver === 'function') {
+      new ResizeObserver(scheduleNotify).observe(bodyEl);
+    }
+
     // In case of window resizing
-    window.addEventListener('resize', notify)
+    window.addEventListener('resize', scheduleNotify)
 
     // Wait for any images to finish loading
-    window.addEventListener('load', notify)
+    window.addEventListener('load', scheduleNotify)
     notify()
   })();
 
@@ -158,11 +223,13 @@
       el.replaceWith(wrapper)
       return wrapper
     }
-    const frames = document.getElementsByTagName('iframe')
+    // Snapshot the live HTMLCollection before mutating it: wrapElement replaces
+    // each iframe, which would otherwise shift the collection mid-loop.
+    const frames = Array.from(document.getElementsByTagName('iframe'))
     const wrappedFrames = []
-    for (const i = 0; i < frames.length; i++) {
+    for (let i = 0; i < frames.length; i++) {
       const wrappedFrame = wrapElement(frames[i], 'iframe__wrapper iframe__wrapper--loading')
-      frames[i].addEventListener('load', function() {
+      wrappedFrame.querySelector('iframe').addEventListener('load', function() {
         wrappedFrame.classList.remove('iframe__wrapper--loading')
       })
       wrappedFrames.push(wrappedFrame)
@@ -172,7 +239,7 @@
       return {
         toOnline: function() {},
         toOffline: function() {
-          for (const i = 0; i < wrappedFrames.length; i++) {
+          for (let i = 0; i < wrappedFrames.length; i++) {
             const wrappedFrame = wrappedFrames[i]
             wrappedFrame.classList.add('iframe__wrapper--offline')
           }
@@ -184,7 +251,7 @@
     function OfflineState(context) {
       return {
         toOnline: function() {
-          for (const i = 0; i < wrappedFrames.length; i++) {
+          for (let i = 0; i < wrappedFrames.length; i++) {
             const wrappedFrame = wrappedFrames[i]
             wrappedFrame.classList.remove('iframe__wrapper--offline')
           }
