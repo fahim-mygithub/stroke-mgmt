@@ -2,7 +2,7 @@ module.exports = {
   expo: {
     name: 'Ischemic Stroke',
     slug: 'stroke-mgmt',
-    version: '1.1.4',
+    version: '1.1.5',
     icon: './assets/icon.png',
     userInterfaceStyle: 'light',
     jsEngine: 'hermes',

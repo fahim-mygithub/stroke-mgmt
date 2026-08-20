@@ -1192,7 +1192,8 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
       </li>
       
     </ul>
-    <ul class="template outcomes__list">
+    
+<ul class="template outcomes__list">
   <h1 class="template outcomes__headline">Results</h1>
   
   <li class="template outcomes__list-item">
@@ -1202,6 +1203,7 @@ exports[`EjsAlgorithmRenderer Behavior should render scored algorithm 1`] = `
 </li>
   
 </ul>
+
 
   </main>
   
@@ -1978,7 +1980,8 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
     <p class="template body__paragraph">
       <img src="https://placeimg.com/640/480/any" height="100"><ul><li>airway</li><li>breathing</li><li>circulation</li><li>time of stroke onset</li><a href="google.com">google</a></ul>
     </p>
-    <ul class="template outcomes__list">
+    
+<ul class="template outcomes__list">
   <h1 class="template outcomes__headline">Results</h1>
   
   
@@ -2013,6 +2016,7 @@ exports[`EjsAlgorithmRenderer Behavior should render text algorithm 1`] = `
   
   
 </ul>
+
 
   </main>
   

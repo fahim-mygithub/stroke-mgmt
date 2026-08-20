@@ -81,6 +81,28 @@ describe('EjsAlgorithmRenderer', () => {
       expect(html).toContain('__finish__:1');
     });
 
+    it('renders a completion button instead of the outcome list when no outcomes are attached', async () => {
+      const info = new AlgorithmInfo({
+        id: new AlgorithmId('3'),
+        title: 'Terminal algorithm',
+        body: 'The pathway ends here',
+        summary: 'summary',
+        thumbnail: new Image('/img.png'),
+        outcomes: [],
+        shouldShowOnHomeScreen: true,
+        lastUpdated: new Date(0),
+        citations: [],
+      });
+
+      const renderer = new EjsRenderer(fs);
+      const html = await renderer.renderAlgorithm(new TextAlgorithm({ info }));
+      expect(html).toContain('__finish__:-1');
+      // The class name still appears in the inlined stylesheet; only the
+      // rendered headline element must be absent.
+      expect(html).not.toContain('<h1 class="template outcomes__headline">');
+      expect(html).not.toContain('Results will appear here');
+    });
+
     // The generated CSS is snapshotted, but a snapshot only reports that it
     // changed — it cannot say the image rule is still correct. These assert it.
     describe('image sizing rules', () => {

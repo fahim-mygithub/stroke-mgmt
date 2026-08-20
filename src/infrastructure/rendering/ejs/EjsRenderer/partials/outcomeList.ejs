@@ -1,3 +1,11 @@
+<% if(data.algorithm.getOutcomes().length === 0) { %>
+<%# A step with no outcomes attached is terminal: the pathway ends here, so %>
+<%# offer the same completion affordance a terminal outcome gets. Index -1 %>
+<%# resolves to no outcome, so the step is recorded without an outcome title. %>
+<button class="template outcomes__button" data-next-id="__finish__:-1">
+  Complete &amp; view summary
+</button>
+<% } else { %>
 <ul class="template outcomes__list">
   <h1 class="template outcomes__headline">Results</h1>
   <% if(data.algorithm.hasOutcomes()) { %>
@@ -26,3 +34,4 @@
   <%- include('noOutcomesYet') %>
   <% } %>
 </ul>
+<% } %>
